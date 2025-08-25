@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="my-4">Admin - Attendance Records</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Timestamp</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for attendance, user in records %}
+        <tr>
+            <td>{{ attendance.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ attendance.timestamp }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

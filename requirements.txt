@@ -1,0 +1,4 @@
+Flask
+Flask-SQLAlchemy
+qrcode[pil]
+mysql-connector-python
