@@ -1,136 +1,974 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+## 8.1.0 - 2025-03-17
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+### Changed
 
-## [v1.1.2](https://github.com/ljharb/function-bind/compare/v1.1.1...v1.1.2) - 2023-10-12
+- `Content-Security-Policy` gives a better error when a directive value, like `self`, should be quoted. See [#482](https://github.com/helmetjs/helmet/issues/482)
 
-### Merged
+## 8.0.0 - 2024-09-28
 
-- Point to the correct file [`#16`](https://github.com/ljharb/function-bind/pull/16)
+### Changed
 
-### Commits
+- **Breaking:** `Strict-Transport-Security` now has a max-age of 365 days, up from 180
+- **Breaking:** `Content-Security-Policy` middleware now throws an error if a directive should have quotes but does not, such as `self` instead of `'self'`. See [#454](https://github.com/helmetjs/helmet/issues/454)
+- **Breaking:** `Content-Security-Policy`'s `getDefaultDirectives` now returns a deep copy. This only affects users who were mutating the result
+- **Breaking:** `Strict-Transport-Security` now throws an error when "includeSubDomains" option is misspelled. This was previously a warning
 
-- [Tests] migrate tests to Github Actions [`4f8b57c`](https://github.com/ljharb/function-bind/commit/4f8b57c02f2011fe9ae353d5e74e8745f0988af8)
-- [Tests] remove `jscs` [`90eb2ed`](https://github.com/ljharb/function-bind/commit/90eb2edbeefd5b76cd6c3a482ea3454db169b31f)
-- [meta] update `.gitignore` [`53fcdc3`](https://github.com/ljharb/function-bind/commit/53fcdc371cd66634d6e9b71c836a50f437e89fed)
-- [Tests] up to `node` `v11.10`, `v10.15`, `v9.11`, `v8.15`, `v6.16`, `v4.9`; use `nvm install-latest-npm`; run audit script in tests [`1fe8f6e`](https://github.com/ljharb/function-bind/commit/1fe8f6e9aed0dfa8d8b3cdbd00c7f5ea0cd2b36e)
-- [meta] add `auto-changelog` [`1921fcb`](https://github.com/ljharb/function-bind/commit/1921fcb5b416b63ffc4acad051b6aad5722f777d)
-- [Robustness] remove runtime dependency on all builtins except `.apply` [`f743e61`](https://github.com/ljharb/function-bind/commit/f743e61aa6bb2360358c04d4884c9db853d118b7)
-- Docs: enable badges; update wording [`503cb12`](https://github.com/ljharb/function-bind/commit/503cb12d998b5f91822776c73332c7adcd6355dd)
-- [readme] update badges [`290c5db`](https://github.com/ljharb/function-bind/commit/290c5dbbbda7264efaeb886552a374b869a4bb48)
-- [Tests] switch to nyc for coverage [`ea360ba`](https://github.com/ljharb/function-bind/commit/ea360ba907fc2601ed18d01a3827fa2d3533cdf8)
-- [Dev Deps] update `eslint`, `@ljharb/eslint-config`, `tape` [`cae5e9e`](https://github.com/ljharb/function-bind/commit/cae5e9e07a5578dc6df26c03ee22851ce05b943c)
-- [meta] add `funding` field; create FUNDING.yml [`c9f4274`](https://github.com/ljharb/function-bind/commit/c9f4274aa80ea3aae9657a3938fdba41a3b04ca6)
-- [Tests] fix eslint errors from #15 [`f69aaa2`](https://github.com/ljharb/function-bind/commit/f69aaa2beb2fdab4415bfb885760a699d0b9c964)
-- [actions] fix permissions [`99a0cd9`](https://github.com/ljharb/function-bind/commit/99a0cd9f3b5bac223a0d572f081834cd73314be7)
-- [meta] use `npmignore` to autogenerate an npmignore file [`f03b524`](https://github.com/ljharb/function-bind/commit/f03b524ca91f75a109a5d062f029122c86ecd1ae)
-- [Dev Deps] update `@ljharb/eslint‑config`, `eslint`, `tape` [`7af9300`](https://github.com/ljharb/function-bind/commit/7af930023ae2ce7645489532821e4fbbcd7a2280)
-- [Dev Deps] update `eslint`, `@ljharb/eslint-config`, `covert`, `tape` [`64a9127`](https://github.com/ljharb/function-bind/commit/64a9127ab0bd331b93d6572eaf6e9971967fc08c)
-- [Tests] use `aud` instead of `npm audit` [`e75069c`](https://github.com/ljharb/function-bind/commit/e75069c50010a8fcce2a9ce2324934c35fdb4386)
-- [Dev Deps] update `@ljharb/eslint-config`, `aud`, `tape` [`d03555c`](https://github.com/ljharb/function-bind/commit/d03555ca59dea3b71ce710045e4303b9e2619e28)
-- [meta] add `safe-publish-latest` [`9c8f809`](https://github.com/ljharb/function-bind/commit/9c8f8092aed027d7e80c94f517aa892385b64f09)
-- [Dev Deps] update `@ljharb/eslint-config`, `tape` [`baf6893`](https://github.com/ljharb/function-bind/commit/baf6893e27f5b59abe88bc1995e6f6ed1e527397)
-- [meta] create SECURITY.md [`4db1779`](https://github.com/ljharb/function-bind/commit/4db17799f1f28ae294cb95e0081ca2b591c3911b)
-- [Tests] add `npm run audit` [`c8b38ec`](https://github.com/ljharb/function-bind/commit/c8b38ec40ed3f85dabdee40ed4148f1748375bc2)
-- Revert "Point to the correct file" [`05cdf0f`](https://github.com/ljharb/function-bind/commit/05cdf0fa205c6a3c5ba40bbedd1dfa9874f915c9)
+### Removed
 
-## [v1.1.1](https://github.com/ljharb/function-bind/compare/v1.1.0...v1.1.1) - 2017-08-28
+- **Breaking:** Drop support for Node 16 and 17. Node 18+ is now required
 
-### Commits
+## 7.2.0 - 2024-09-28
 
-- [Tests] up to `node` `v8`; newer npm breaks on older node; fix scripts [`817f7d2`](https://github.com/ljharb/function-bind/commit/817f7d28470fdbff8ef608d4d565dd4d1430bc5e)
-- [Dev Deps] update `eslint`, `jscs`, `tape`, `@ljharb/eslint-config` [`854288b`](https://github.com/ljharb/function-bind/commit/854288b1b6f5c555f89aceb9eff1152510262084)
-- [Dev Deps] update `tape`, `jscs`, `eslint`, `@ljharb/eslint-config` [`83e639f`](https://github.com/ljharb/function-bind/commit/83e639ff74e6cd6921285bccec22c1bcf72311bd)
-- Only apps should have lockfiles [`5ed97f5`](https://github.com/ljharb/function-bind/commit/5ed97f51235c17774e0832e122abda0f3229c908)
-- Use a SPDX-compliant “license” field. [`5feefea`](https://github.com/ljharb/function-bind/commit/5feefea0dc0193993e83e5df01ded424403a5381)
+### Changed
 
-## [v1.1.0](https://github.com/ljharb/function-bind/compare/v1.0.2...v1.1.0) - 2016-02-14
+- `Content-Security-Policy` middleware now warns if a directive should have quotes but does not, such as `self` instead of `'self'`. This will be an error in future versions. See [#454](https://github.com/helmetjs/helmet/issues/454)
 
-### Commits
+## 7.1.0 - 2023-11-07
 
-- Update `eslint`, `tape`; use my personal shared `eslint` config [`9c9062a`](https://github.com/ljharb/function-bind/commit/9c9062abbe9dd70b59ea2c3a3c3a81f29b457097)
-- Add `npm run eslint` [`dd96c56`](https://github.com/ljharb/function-bind/commit/dd96c56720034a3c1ffee10b8a59a6f7c53e24ad)
-- [New] return the native `bind` when available. [`82186e0`](https://github.com/ljharb/function-bind/commit/82186e03d73e580f95ff167e03f3582bed90ed72)
-- [Dev Deps] update `tape`, `jscs`, `eslint`, `@ljharb/eslint-config` [`a3dd767`](https://github.com/ljharb/function-bind/commit/a3dd76720c795cb7f4586b0544efabf8aa107b8b)
-- Update `eslint` [`3dae2f7`](https://github.com/ljharb/function-bind/commit/3dae2f7423de30a2d20313ddb1edc19660142fe9)
-- Update `tape`, `covert`, `jscs` [`a181eee`](https://github.com/ljharb/function-bind/commit/a181eee0cfa24eb229c6e843a971f36e060a2f6a)
-- [Tests] up to `node` `v5.6`, `v4.3` [`964929a`](https://github.com/ljharb/function-bind/commit/964929a6a4ddb36fb128de2bcc20af5e4f22e1ed)
-- Test up to `io.js` `v2.1` [`2be7310`](https://github.com/ljharb/function-bind/commit/2be7310f2f74886a7124ca925be411117d41d5ea)
-- Update `tape`, `jscs`, `eslint`, `@ljharb/eslint-config` [`45f3d68`](https://github.com/ljharb/function-bind/commit/45f3d6865c6ca93726abcef54febe009087af101)
-- [Dev Deps] update `tape`, `jscs` [`6e1340d`](https://github.com/ljharb/function-bind/commit/6e1340d94642deaecad3e717825db641af4f8b1f)
-- [Tests] up to `io.js` `v3.3`, `node` `v4.1` [`d9bad2b`](https://github.com/ljharb/function-bind/commit/d9bad2b778b1b3a6dd2876087b88b3acf319f8cc)
-- Update `eslint` [`935590c`](https://github.com/ljharb/function-bind/commit/935590caa024ab356102e4858e8fc315b2ccc446)
-- [Dev Deps] update `jscs`, `eslint`, `@ljharb/eslint-config` [`8c9a1ef`](https://github.com/ljharb/function-bind/commit/8c9a1efd848e5167887aa8501857a0940a480c57)
-- Test on `io.js` `v2.2` [`9a3a38c`](https://github.com/ljharb/function-bind/commit/9a3a38c92013aed6e108666e7bd40969b84ac86e)
-- Run `travis-ci` tests on `iojs` and `node` v0.12; speed up builds; allow 0.8 failures. [`69afc26`](https://github.com/ljharb/function-bind/commit/69afc2617405b147dd2a8d8ae73ca9e9283f18b4)
-- [Dev Deps] Update `tape`, `eslint` [`36c1be0`](https://github.com/ljharb/function-bind/commit/36c1be0ab12b45fe5df6b0fdb01a5d5137fd0115)
-- Update `tape`, `jscs` [`98d8303`](https://github.com/ljharb/function-bind/commit/98d8303cd5ca1c6b8f985469f86b0d44d7d45f6e)
-- Update `jscs` [`9633a4e`](https://github.com/ljharb/function-bind/commit/9633a4e9fbf82051c240855166e468ba8ba0846f)
-- Update `tape`, `jscs` [`c80ef0f`](https://github.com/ljharb/function-bind/commit/c80ef0f46efc9791e76fa50de4414092ac147831)
-- Test up to `io.js` `v3.0` [`7e2c853`](https://github.com/ljharb/function-bind/commit/7e2c8537d52ab9cf5a655755561d8917684c0df4)
-- Test on `io.js` `v2.4` [`5a199a2`](https://github.com/ljharb/function-bind/commit/5a199a27ba46795ba5eaf0845d07d4b8232895c9)
-- Test on `io.js` `v2.3` [`a511b88`](https://github.com/ljharb/function-bind/commit/a511b8896de0bddf3b56862daa416c701f4d0453)
-- Fixing a typo from 822b4e1938db02dc9584aa434fd3a45cb20caf43 [`732d6b6`](https://github.com/ljharb/function-bind/commit/732d6b63a9b33b45230e630dbcac7a10855d3266)
-- Update `jscs` [`da52a48`](https://github.com/ljharb/function-bind/commit/da52a4886c06d6490f46ae30b15e4163ba08905d)
-- Lock covert to v1.0.0. [`d6150fd`](https://github.com/ljharb/function-bind/commit/d6150fda1e6f486718ebdeff823333d9e48e7430)
+### Added
 
-## [v1.0.2](https://github.com/ljharb/function-bind/compare/v1.0.1...v1.0.2) - 2014-10-04
+- `helmet.crossOriginEmbedderPolicy` now supports the `unsafe-none` directive. See [#477](https://github.com/helmetjs/helmet/pull/447)
 
-## [v1.0.1](https://github.com/ljharb/function-bind/compare/v1.0.0...v1.0.1) - 2014-10-03
+## 7.0.0 - 2023-05-06
 
-### Merged
+### Changed
 
-- make CI build faster [`#3`](https://github.com/ljharb/function-bind/pull/3)
+- **Breaking:** `Cross-Origin-Embedder-Policy` middleware is now disabled by default. See [#411](https://github.com/helmetjs/helmet/issues/411)
 
-### Commits
+### Removed
 
-- Using my standard jscs.json [`d8ee94c`](https://github.com/ljharb/function-bind/commit/d8ee94c993eff0a84cf5744fe6a29627f5cffa1a)
-- Adding `npm run lint` [`7571ab7`](https://github.com/ljharb/function-bind/commit/7571ab7dfdbd99b25a1dbb2d232622bd6f4f9c10)
-- Using consistent indentation [`e91a1b1`](https://github.com/ljharb/function-bind/commit/e91a1b13a61e99ec1e530e299b55508f74218a95)
-- Updating jscs [`7e17892`](https://github.com/ljharb/function-bind/commit/7e1789284bc629bc9c1547a61c9b227bbd8c7a65)
-- Using consistent quotes [`c50b57f`](https://github.com/ljharb/function-bind/commit/c50b57fcd1c5ec38320979c837006069ebe02b77)
-- Adding keywords [`cb94631`](https://github.com/ljharb/function-bind/commit/cb946314eed35f21186a25fb42fc118772f9ee00)
-- Directly export a function expression instead of using a declaration, and relying on hoisting. [`5a33c5f`](https://github.com/ljharb/function-bind/commit/5a33c5f45642de180e0d207110bf7d1843ceb87c)
-- Naming npm URL and badge in README; use SVG [`2aef8fc`](https://github.com/ljharb/function-bind/commit/2aef8fcb79d54e63a58ae557c4e60949e05d5e16)
-- Naming deps URLs in README [`04228d7`](https://github.com/ljharb/function-bind/commit/04228d766670ee45ca24e98345c1f6a7621065b5)
-- Naming travis-ci URLs in README; using SVG [`62c810c`](https://github.com/ljharb/function-bind/commit/62c810c2f54ced956cd4d4ab7b793055addfe36e)
-- Make sure functions are invoked correctly (also passing coverage tests) [`2b289b4`](https://github.com/ljharb/function-bind/commit/2b289b4dfbf037ffcfa4dc95eb540f6165e9e43a)
-- Removing the strict mode pragmas; they make tests fail. [`1aa701d`](https://github.com/ljharb/function-bind/commit/1aa701d199ddc3782476e8f7eef82679be97b845)
-- Adding myself as a contributor [`85fd57b`](https://github.com/ljharb/function-bind/commit/85fd57b0860e5a7af42de9a287f3f265fc6d72fc)
-- Adding strict mode pragmas [`915b08e`](https://github.com/ljharb/function-bind/commit/915b08e084c86a722eafe7245e21db74aa21ca4c)
-- Adding devDeps URLs to README [`4ccc731`](https://github.com/ljharb/function-bind/commit/4ccc73112c1769859e4ca3076caf4086b3cba2cd)
-- Fixing the description. [`a7a472c`](https://github.com/ljharb/function-bind/commit/a7a472cf649af515c635cf560fc478fbe48999c8)
-- Using a function expression instead of a function declaration. [`b5d3e4e`](https://github.com/ljharb/function-bind/commit/b5d3e4ea6aaffc63888953eeb1fbc7ff45f1fa14)
-- Updating tape [`f086be6`](https://github.com/ljharb/function-bind/commit/f086be6029fb56dde61a258c1340600fa174d1e0)
-- Updating jscs [`5f9bdb3`](https://github.com/ljharb/function-bind/commit/5f9bdb375ab13ba48f30852aab94029520c54d71)
-- Updating jscs [`9b409ba`](https://github.com/ljharb/function-bind/commit/9b409ba6118e23395a4e5d83ef39152aab9d3bfc)
-- Run coverage as part of tests. [`8e1b6d4`](https://github.com/ljharb/function-bind/commit/8e1b6d459f047d1bd4fee814e01247c984c80bd0)
-- Run linter as part of tests [`c1ca83f`](https://github.com/ljharb/function-bind/commit/c1ca83f832df94587d09e621beba682fabfaa987)
-- Updating covert [`701e837`](https://github.com/ljharb/function-bind/commit/701e83774b57b4d3ef631e1948143f43a72f4bb9)
+- **Breaking:** Drop support for Node 14 and 15. Node 16+ is now required
+- **Breaking:** `Expect-CT` is no longer part of Helmet. If you still need it, you can use the [`expect-ct` package](https://www.npmjs.com/package/expect-ct). See [#378](https://github.com/helmetjs/helmet/issues/378)
 
-## [v1.0.0](https://github.com/ljharb/function-bind/compare/v0.2.0...v1.0.0) - 2014-08-09
+## 6.2.0 - 2023-05-06
 
-### Commits
+- Expose header names (e.g., `strictTransportSecurity` for the `Strict-Transport-Security` header, instead of `hsts`)
+- Rework documentation
 
-- Make sure old and unstable nodes don't fail Travis [`27adca3`](https://github.com/ljharb/function-bind/commit/27adca34a4ab6ad67b6dfde43942a1b103ce4d75)
-- Fixing an issue when the bound function is called as a constructor in ES3. [`e20122d`](https://github.com/ljharb/function-bind/commit/e20122d267d92ce553859b280cbbea5d27c07731)
-- Adding `npm run coverage` [`a2e29c4`](https://github.com/ljharb/function-bind/commit/a2e29c4ecaef9e2f6cd1603e868c139073375502)
-- Updating tape [`b741168`](https://github.com/ljharb/function-bind/commit/b741168b12b235b1717ff696087645526b69213c)
-- Upgrading tape [`63631a0`](https://github.com/ljharb/function-bind/commit/63631a04c7fbe97cc2fa61829cc27246d6986f74)
-- Updating tape [`363cb46`](https://github.com/ljharb/function-bind/commit/363cb46dafb23cb3e347729a22f9448051d78464)
+## 6.1.5 - 2023-04-11
 
-## v0.2.0 - 2014-03-23
+### Fixed
 
-### Commits
+- Fixed yet another issue with TypeScript exports. See [#420](https://github.com/helmetjs/helmet/pull/418)
 
-- Updating test coverage to match es5-shim. [`aa94d44`](https://github.com/ljharb/function-bind/commit/aa94d44b8f9d7f69f10e060db7709aa7a694e5d4)
-- initial [`942ee07`](https://github.com/ljharb/function-bind/commit/942ee07e94e542d91798137bc4b80b926137e066)
-- Setting the bound function's length properly. [`079f46a`](https://github.com/ljharb/function-bind/commit/079f46a2d3515b7c0b308c2c13fceb641f97ca25)
-- Ensuring that some older browsers will throw when given a regex. [`36ac55b`](https://github.com/ljharb/function-bind/commit/36ac55b87f460d4330253c92870aa26fbfe8227f)
-- Removing npm scripts that don't have dependencies [`9d2be60`](https://github.com/ljharb/function-bind/commit/9d2be600002cb8bc8606f8f3585ad3e05868c750)
-- Updating tape [`297a4ac`](https://github.com/ljharb/function-bind/commit/297a4acc5464db381940aafb194d1c88f4e678f3)
-- Skipping length tests for now. [`d9891ea`](https://github.com/ljharb/function-bind/commit/d9891ea4d2aaffa69f408339cdd61ff740f70565)
-- don't take my tea [`dccd930`](https://github.com/ljharb/function-bind/commit/dccd930bfd60ea10cb178d28c97550c3bc8c1e07)
+## 6.1.4 - 2023-04-10
+
+### Fixed
+
+- Fix another issue with TypeScript default exports. See [#418](https://github.com/helmetjs/helmet/pull/418)
+
+## 6.1.3 - 2023-04-10
+
+### Fixed
+
+- Fix issue with TypeScript default exports. See [#417](https://github.com/helmetjs/helmet/pull/417)
+
+## 6.1.2 - 2023-04-09
+
+### Fixed
+
+- Retored `main` to package to help with some build tools
+
+## 6.1.1 - 2023-04-08
+
+### Fixed
+
+- Fixed missing package metadata
+
+## 6.1.0 - 2023-04-08
+
+### Changed
+
+- Improve support for various TypeScript setups, including "nodenext". See [#405](https://github.com/helmetjs/helmet/pull/405)
+
+## 6.0.1 - 2022-11-29
+
+### Fixed
+
+- `crossOriginEmbedderPolicy` did not accept options at the top level. See [#390](https://github.com/helmetjs/helmet/issues/390)
+
+## 6.0.0 - 2022-08-26
+
+### Changed
+
+- **Breaking:** `helmet.contentSecurityPolicy` no longer sets `block-all-mixed-content` directive by default
+- **Breaking:** `helmet.expectCt` is no longer set by default. It can, however, be explicitly enabled. It will be removed in Helmet 7. See [#310](https://github.com/helmetjs/helmet/issues/310)
+- **Breaking:** Increase TypeScript strictness around some arguments. Only affects TypeScript users, and may not require any code changes. See [#369](https://github.com/helmetjs/helmet/issues/369)
+- `helmet.frameguard` no longer offers a specific error when trying to use `ALLOW-FROM`; it just says that it is unsupported. Only the error message has changed
+
+### Removed
+
+- **Breaking:** Dropped support for Node 12 and 13. Node 14+ is now required
+
+## 5.1.1 - 2022-07-23
+
+### Changed
+
+- Fix TypeScript bug with some TypeScript configurations. See [#375](https://github.com/helmetjs/helmet/pull/375) and [#359](https://github.com/helmetjs/helmet/issues/359)
+
+## 5.1.0 - 2022-05-17
+
+### Added
+
+- `Cross-Origin-Embedder-Policy`: support `credentialless` policy. See [#365](https://github.com/helmetjs/helmet/pull/365)
+- Documented how to set both `Content-Security-Policy` and `Content-Security-Policy-Report-Only`
+
+### Changed
+
+- Cleaned up some documentation around `Origin-Agent-Cluster`
+
+## 5.0.2 - 2022-01-22
+
+### Changed
+
+- Improve imports for CommonJS and ECMAScript modules. See [#345](https://github.com/helmetjs/helmet/pull/345)
+- Fixed some documentation
+
+## 5.0.1 - 2022-01-03
+
+### Changed
+
+- Fixed some documentation
+
+### Removed
+
+- Removed some unused internal code
+
+## 5.0.0 - 2022-01-02
+
+### Added
+
+- ECMAScript module imports (i.e., `import helmet from "helmet"` and `import { frameguard } from "helmet"`). See [#320](https://github.com/helmetjs/helmet/issues/320)
+
+### Changed
+
+- **Breaking:** `helmet.contentSecurityPolicy`: `useDefaults` option now defaults to `true`
+- **Breaking:** `helmet.contentSecurityPolicy`: `form-action` directive is now set to `'self'` by default
+- **Breaking:** `helmet.crossOriginEmbedderPolicy` is enabled by default
+- **Breaking:** `helmet.crossOriginOpenerPolicy` is enabled by default
+- **Breaking:** `helmet.crossOriginResourcePolicy` is enabled by default
+- **Breaking:** `helmet.originAgentCluster` is enabled by default
+- `helmet.frameguard`: add TypeScript editor autocomplete. See [#322](https://github.com/helmetjs/helmet/pull/322)
+- Top-level `helmet()` function is slightly faster
+
+### Removed
+
+- **Breaking:** Drop support for Node 10 and 11. Node 12+ is now required
+
+## 4.6.0 - 2021-05-01
+
+### Added
+
+- `helmet.contentSecurityPolicy`: the `useDefaults` option, defaulting to `false`, lets you selectively override defaults more easily
+- Explicitly define TypeScript types in `package.json`. See [#303](https://github.com/helmetjs/helmet/pull/303)
+
+## 4.5.0 - 2021-04-17
+
+### Added
+
+- `helmet.crossOriginEmbedderPolicy`: a new middleware for the `Cross-Origin-Embedder-Policy` header, disabled by default
+- `helmet.crossOriginOpenerPolicy`: a new middleware for the `Cross-Origin-Opener-Policy` header, disabled by default
+- `helmet.crossOriginResourcePolicy`: a new middleware for the `Cross-Origin-Resource-Policy` header, disabled by default
+
+### Changed
+
+- `true` enables a middleware with default options. Previously, this would fail with an error if the middleware was already enabled by default.
+- Log a warning when passing options to `originAgentCluster` at the top level
+
+### Fixed
+
+- Incorrect documentation
+
+## 4.4.1 - 2021-01-18
+
+### Changed
+
+- Shrink the published package by about 2.5 kB
+
+## 4.4.0 - 2021-01-17
+
+### Added
+
+- `helmet.originAgentCluster`: a new middleware for the `Origin-Agent-Cluster` header, disabled by default
+
+## 4.3.1 - 2020-12-27
+
+### Fixed
+
+- `helmet.contentSecurityPolicy`: broken TypeScript types. See [#283](https://github.com/helmetjs/helmet/issues/283)
+
+## 4.3.0 - 2020-12-27
+
+### Added
+
+- `helmet.contentSecurityPolicy`: setting the `default-src` to `helmet.contentSecurityPolicy.dangerouslyDisableDefaultSrc` disables it
+
+### Changed
+
+- `helmet.frameguard`: slightly improved error messages for non-strings
+
+## 4.2.0 - 2020-11-01
+
+### Added
+
+- `helmet.contentSecurityPolicy`: get the default directives with `contentSecurityPolicy.getDefaultDirectives()`
+
+### Changed
+
+- `helmet()` now supports objects that don't have `Object.prototype` in their chain, such as `Object.create(null)`, as options
+- `helmet.expectCt`: `max-age` is now first. See [#264](https://github.com/helmetjs/helmet/pull/264)
+
+## 4.1.1 - 2020-09-10
+
+### Changed
+
+- Fixed a few errors in the README
+
+## 4.1.0 - 2020-08-15
+
+### Added
+
+- `helmet.contentSecurityPolicy`:
+  - Directive values can now include functions, as they could in Helmet 3. See [#243](https://github.com/helmetjs/helmet/issues/243)
+
+### Changed
+
+- Helmet should now play more nicely with TypeScript
+
+### Removed
+
+- The `HelmetOptions` interface is no longer exported. This only affects TypeScript users. If you need the functionality back, see [this comment](https://github.com/helmetjs/helmet/issues/235#issuecomment-674016883)
+
+## 4.0.0 - 2020-08-02
+
+See the [Helmet 4 upgrade guide](https://github.com/helmetjs/helmet/wiki/Helmet-4-upgrade-guide) for help upgrading from Helmet 3.
+
+### Added
+
+- `helmet.contentSecurityPolicy`:
+  - If no `default-src` directive is supplied, an error is thrown
+  - Directive lists can be any iterable, not just arrays
+
+### Changed
+
+- This package no longer has dependencies. This should have no effect on end users, other than speeding up installation time.
+- `helmet.contentSecurityPolicy`:
+  - There is now a default set of directives if none are supplied
+  - Duplicate keys now throw an error. See [helmetjs/csp#73](https://github.com/helmetjs/csp/issues/73)
+  - This middleware is more lenient, allowing more directive names or values
+- `helmet.xssFilter` now disables the buggy XSS filter by default. See [#230](https://github.com/helmetjs/helmet/issues/230)
+
+### Removed
+
+- Dropped support for old Node versions. Node 10+ is now required
+- `helmet.featurePolicy`. If you still need it, use the `feature-policy` package on npm.
+- `helmet.hpkp`. If you still need it, use the `hpkp` package on npm.
+- `helmet.noCache`. If you still need it, use the `nocache` package on npm.
+- `helmet.contentSecurityPolicy`:
+  - Removed browser sniffing (including the `browserSniff` and `disableAndroid` parameters). See [helmetjs/csp#97](https://github.com/helmetjs/csp/issues/97)
+  - Removed conditional support. This includes directive functions and support for a function as the `reportOnly`. [Read this if you need help.](https://github.com/helmetjs/helmet/wiki/Conditionally-using-middleware)
+  - Removed a lot of checks—you should be checking your CSP with a different tool
+  - Removed support for legacy headers (and therefore the `setAllHeaders` parameter). [Read this if you need help.](https://github.com/helmetjs/helmet/wiki/Setting-legacy-Content-Security-Policy-headers-in-Helmet-4)
+  - Removed the `loose` option
+  - Removed support for functions as directive values. You must supply an iterable of strings
+- `helmet.frameguard`:
+  - Dropped support for the `ALLOW-FROM` action. [Read more here.](https://github.com/helmetjs/helmet/wiki/How-to-use-X%E2%80%93Frame%E2%80%93Options's-%60ALLOW%E2%80%93FROM%60-directive)
+- `helmet.hidePoweredBy` no longer accepts arguments. See [this article](https://github.com/helmetjs/helmet/wiki/How-to-set-a-custom-X%E2%80%93Powered%E2%80%93By-header) to see how to replicate the removed behavior. See [#224](https://github.com/helmetjs/helmet/issues/224).
+- `helmet.hsts`:
+  - Dropped support for `includeSubdomains` with a lowercase D. See [#231](https://github.com/helmetjs/helmet/issues/231)
+  - Dropped support for `setIf`. [Read this if you need help.](https://github.com/helmetjs/helmet/wiki/Conditionally-using-middleware) See [#232](https://github.com/helmetjs/helmet/issues/232)
+- `helmet.xssFilter` no longer accepts options. Read ["How to disable blocking with X-XSS-Protection"](https://github.com/helmetjs/helmet/wiki/How-to-disable-blocking-with-X%E2%80%93XSS%E2%80%93Protection) and ["How to enable the `report` directive with X-XSS-Protection"](https://github.com/helmetjs/helmet/wiki/How-to-enable-the-%60report%60-directive-with-X%E2%80%93XSS%E2%80%93Protection) if you need the legacy behavior.
+
+## 3.23.3 - 2020-06-26
+
+### Changed
+
+- `helmet.expectCt` is no longer a separate package. This should have no effect on end users.
+- `helmet.frameguard` is no longer a separate package. This should have no effect on end users.
+
+## 3.23.2 - 2020-06-23
+
+### Changed
+
+- `helmet.dnsPrefetchControl` is no longer a separate package. This should have no effect on end users.
+
+## 3.23.1 - 2020-06-16
+
+### Changed
+
+- `helmet.ieNoOpen` is no longer a separate package. This should have no effect on end users.
+
+## 3.23.0 - 2020-06-12
+
+### Deprecated
+
+- `helmet.featurePolicy` is deprecated. Use the `feature-policy` module instead.
+
+## 3.22.1 - 2020-06-10
+
+### Changed
+
+- Rewrote internals in TypeScript. This should have no effect on end users.
+
+## 3.22.0 - 2020-03-24
+
+### Changed
+
+- Updated `helmet-csp` to v2.10.0
+  - Add support for the `allow-downloads` sandbox directive. See [helmet-csp#103](https://github.com/helmetjs/csp/pull/103)
+
+### Deprecated
+
+- `helmet.noCache` is deprecated. Use the `nocache` module instead. See [#215](https://github.com/helmetjs/helmet/issues/215)
+
+## 3.21.3 - 2020-02-24
+
+### Changed
+
+- Updated `helmet-csp` to v2.9.5
+  - Updated `bowser` subdependency from 2.7.0 to 2.9.0
+  - Fixed an issue some people were having when importing the `bowser` subdependency. See [helmet-csp#96](https://github.com/helmetjs/csp/issues/96) and [#101](https://github.com/helmetjs/csp/pull/101)
+
+## 3.21.2 - 2019-10-21
+
+### Changed
+
+- Updated `helmet-csp` to v2.9.4
+  - Updated `bowser` subdependency from 2.6.1 to 2.7.0. See [helmet-csp#94](https://github.com/helmetjs/csp/pull/94)
+
+## 3.21.1 - 2019-09-20
+
+### Fixed
+
+- Updated `helmet-csp` to v2.9.2
+  - Fixed a bug where a request from Firefox 4 could delete `default-src` from future responses
+  - Fixed tablet PC detection by updating `bowser` subdependency to latest version
+
+## 3.21.0 - 2019-09-04
+
+### Added
+
+- Updated `x-xss-protection` to v1.3.0
+  - Added `mode: null` to disable `mode=block`
+
+### Changed
+
+- Updated `helmet-csp` to v2.9.1
+  - Updated `bowser` subdependency from 2.5.3 to 2.5.4. See [helmet-csp#88](https://github.com/helmetjs/csp/pull/88)
+
+## 3.20.1 - 2019-08-28
+
+### Changed
+
+- Updated `helmet-csp` to v2.9.0
+
+## 3.20.0 - 2019-07-24
+
+### Changed
+
+- Updated `helmet-csp` to v2.8.0
+
+## 3.19.0 - 2019-07-17
+
+### Changed
+
+- Updated `dns-prefetch-control` to v0.2.0
+- Updated `dont-sniff-mimetype` to v1.1.0
+- Updated `helmet-crossdomain` to v0.4.0
+- Updated `hide-powered-by` to v1.1.0
+- Updated `x-xss-protection` to v1.2.0
+
+## 3.18.0 - 2019-05-05
+
+### Added
+
+- `featurePolicy` has 19 new features: `ambientLightSensor`, `documentDomain`, `documentWrite`, `encryptedMedia`, `fontDisplayLateSwap`, `layoutAnimations`, `legacyImageFormats`, `loadingFrameDefaultEager`, `oversizedImages`, `pictureInPicture`, `serial`, `syncScript`, `unoptimizedImages`, `unoptimizedLosslessImages`, `unoptimizedLossyImages`, `unsizedMedia`, `verticalScroll`, `wakeLock`, and `xr`
+
+### Changed
+
+- Updated `expect-ct` to v0.2.0
+- Updated `feature-policy` to v0.3.0
+- Updated `frameguard` to v3.1.0
+- Updated `nocache` to v2.1.0
+
+## 3.17.0 - 2019-05-03
+
+### Added
+
+- `referrerPolicy` now supports multiple values
+
+### Changed
+
+- Updated `referrerPolicy` to v1.2.0
+
+## 3.16.0 - 2019-03-10
+
+### Added
+
+- Add email to `bugs` field in `package.json`
+
+### Changed
+
+- Updated `hsts` to v2.2.0
+- Updated `ienoopen` to v1.1.0
+- Changelog is now in the [Keep A Changelog](https://keepachangelog.com/) format
+- Dropped support for Node <4. See [the commit](https://github.com/helmetjs/helmet/commit/a49cec3ca58cce484d2d05e1f908549caa92ed03) for more information
+- Updated Adam Baldwin's contact information
+
+### Deprecated
+
+- `helmet.hsts`'s `setIf` option has been deprecated and will be removed in `hsts@3`. See [helmetjs/hsts#22](https://github.com/helmetjs/hsts/issues/22) for more
+
+* The `includeSubdomains` option (with a lowercase `d`) has been deprecated and will be removed in `hsts@3`. Use the uppercase-D `includeSubDomains` option instead. See [helmetjs/hsts#21](https://github.com/helmetjs/hsts/issues/21) for more
+
+## 3.15.1 - 2019-02-10
+
+### Deprecated
+
+- The `hpkp` middleware has been deprecated. If you still need to use this module, install the standalone `hpkp` module from npm. See [#180](https://github.com/helmetjs/helmet/issues/180) for more.
+
+## 3.15.0 - 2018-11-07
+
+### Added
+
+- `helmet.featurePolicy` now supports four new features
+
+## 3.14.0 - 2018-10-09
+
+### Added
+
+- `helmet.featurePolicy` middleware
+
+## 3.13.0 - 2018-07-22
+
+### Added
+
+- `helmet.permittedCrossDomainPolicies` middleware
+
+## 3.12.2 - 2018-07-20
+
+### Fixed
+
+- Removed `lodash.reduce` dependency from `csp`
+
+## 3.12.1 - 2018-05-16
+
+### Fixed
+
+- `expectCt` should use comma instead of semicolon as delimiter
+
+## 3.12.0 - 2018-03-02
+
+### Added
+
+- `xssFilter` now supports `reportUri` option
+
+## 3.11.0 - 2018-02-09
+
+### Added
+
+- Main Helmet middleware is now named to help with debugging
+
+## 3.10.0 - 2018-01-23
+
+### Added
+
+- `csp` now supports `prefix-src` directive
+
+### Fixed
+
+- `csp` no longer loads JSON files internally, helping some module bundlers
+- `false` should be able to disable a CSP directive
+
+## 3.9.0 - 2017-10-13
+
+### Added
+
+- `csp` now supports `strict-dynamic` value
+- `csp` now supports `require-sri-for` directive
+
+### Changed
+
+- Removed `connect` dependency
+
+## 3.8.2 - 2017-09-27
+
+### Changed
+
+- Updated `connect` dependency to latest
+
+## 3.8.1 - 2017-07-28
+
+### Fixed
+
+- `csp` does not automatically set `report-to` when setting `report-uri`
+
+## 3.8.0 - 2017-07-21
+
+### Changed
+
+- `hsts` no longer cares whether it's HTTPS and always sets the header
+
+## 3.7.0 - 2017-07-21
+
+### Added
+
+- `csp` now supports `report-to` directive
+
+### Changed
+
+- Throw an error when used incorrectly
+- Add a few documentation files to `npmignore`
+
+## 3.6.1 - 2017-05-21
+
+### Changed
+
+- Bump `connect` version
+
+## 3.6.0 - 2017-05-04
+
+### Added
+
+- `expectCt` middleware for setting the `Expect-CT` header
+
+## 3.5.0 - 2017-03-06
+
+### Added
+
+- `csp` now supports the `worker-src` directive
+
+## 3.4.1 - 2017-02-24
+
+### Changed
+
+- Bump `connect` version
+
+## 3.4.0 - 2017-01-13
+
+### Added
+
+- `csp` now supports more `sandbox` directives
+
+## 3.3.0 - 2016-12-31
+
+### Added
+
+- `referrerPolicy` allows `strict-origin` and `strict-origin-when-cross-origin` directives
+
+### Changed
+
+- Bump `connect` version
+
+## 3.2.0 - 2016-12-22
+
+### Added
+
+- `csp` now allows `manifest-src` directive
+
+## 3.1.0 - 2016-11-03
+
+### Added
+
+- `csp` now allows `frame-src` directive
+
+## 3.0.0 - 2016-10-28
+
+### Changed
+
+- `csp` will check your directives for common mistakes and throw errors if it finds them. This can be disabled with `loose: true`.
+- Empty arrays are no longer allowed in `csp`. For source lists (like `script-src` or `object-src`), use the standard `scriptSrc: ["'none'"]`. The `sandbox` directive can be `sandbox: true` to block everything.
+- `false` can disable a CSP directive. For example, `scriptSrc: false` is the same as not specifying it.
+- In CSP, `reportOnly: true` no longer requires a `report-uri` to be set.
+- `hsts`'s `maxAge` now defaults to 180 days (instead of 1 day)
+- `hsts`'s `maxAge` parameter is seconds, not milliseconds
+- `hsts` includes subdomains by default
+- `domain` parameter in `frameguard` cannot be empty
+
+### Removed
+
+- `noEtag` option no longer present in `noCache`
+- iOS Chrome `connect-src` workaround in CSP module
+
+## 2.3.0 - 2016-09-30
+
+### Added
+
+- `hpkp` middleware now supports the `includeSubDomains` property with a capital D
+
+### Fixed
+
+- `hpkp` was setting `includeSubdomains` instead of `includeSubDomains`
+
+## 2.2.0 - 2016-09-16
+
+### Added
+
+- `referrerPolicy` middleware
+
+## 2.1.3 - 2016-09-07
+
+### Changed
+
+- Top-level aliases (like `helmet.xssFilter`) are no longer dynamically required
+
+## 2.1.2 - 2016-07-27
+
+### Deprecated
+
+- `nocache`'s `noEtag` option is now deprecated
+
+### Fixed
+
+- `csp` now better handles Firefox on mobile
+
+## 2.1.1 - 2016-06-10
+
+### Changed
+
+- Remove several dependencies from `helmet-csp`
+
+### Fixed
+
+- `frameguard` had a documentation error about its default value
+- `frameguard` docs in main Helmet readme said `frameguard`, not `helmet.frameguard`
+
+## 2.1.0 - 2016-05-18
+
+### Added
+
+- `csp` lets you dynamically set `reportOnly`
+
+## 2.0.0 - 2016-04-29
+
+### Added
+
+- Pass configuration to enable/disable default middlewares
+
+### Changed
+
+- `dnsPrefetchControl` middleware is now enabled by default
+
+### Removed
+
+- No more module aliases. There is now just one way to include each middleware
+- `frameguard` can no longer be initialized with strings; you must use an object
+
+### Fixed
+
+- Make `hpkp` lowercase in documentation
+- Update `hpkp` spec URL in readmes
+- Update `frameguard` header name in readme
+
+## 1.3.0 - 2016-03-01
+
+### Added
+
+- `hpkp` has a `setIf` option to conditionally set the header
+
+## 1.2.0 - 2016-02-29
+
+### Added
+
+- `csp` now has a `browserSniff` option to disable all user-agent sniffing
+
+### Changed
+
+- `frameguard` can now be initialized with options
+- Add `npmignore` file to speed up installs slightly
+
+## 1.1.0 - 2016-01-12
+
+### Added
+
+- Code of conduct
+- `dnsPrefetchControl` middleware
+
+### Fixed
+
+- `csp` readme had syntax errors
+
+## 1.0.2 - 2016-01-08
+
+### Fixed
+
+- `csp` wouldn't recognize `IE Mobile` browsers
+- `csp` had some errors in its readme
+- Main readme had a syntax error
+
+## 1.0.1 - 2015-12-19
+
+### Fixed
+
+- `csp` with no User Agent would cause errors
+
+## 1.0.0 - 2015-12-18
+
+### Added
+
+- `csp` module supports dynamically-generated values
+
+### Changed
+
+- `csp` directives are now under the `directives` key
+- `hpkp`'s `Report-Only` header is now opt-in, not opt-out
+- Tweak readmes of every sub-repo
+
+### Removed
+
+- `crossdomain` middleware
+- `csp` no longer throws errors when some directives aren't quoted (`'self'`, for example)
+- `maxage` option in the `hpkp` middleware
+- `safari5` option from `csp` module
+
+### Fixed
+
+- Old Firefox Content-Security-Policy behavior for `unsafe-inline` and `unsafe-eval`
+- Dynamic `csp` policies is no longer recursive
+
+## 0.15.0 - 2015-11-26
+
+### Changed
+
+- `hpkp` allows a `report-uri` without the `Report-Only` header
+
+## 0.14.0 - 2015-11-01
+
+### Added
+
+- `nocache` now sends the `Surrogate-Control` header
+
+### Changed
+
+- `nocache` no longer contains the `private` directive in the `Cache-Control` header
+
+## 0.13.0 - 2015-10-23
+
+### Added
+
+- `xssFilter` now has a function name
+- Added new CSP docs to readme
+
+### Changed
+
+- HSTS option renamed from `includeSubdomains` to `includeSubDomains`
+
+## 0.11.0 - 2015-09-18
+
+### Added
+
+- `csp` now supports Microsoft Edge
+- CSP Level 2 support
+
+### Changed
+
+- Updated `connect` to 3.4.0
+- Updated `depd` to 1.1.0
+
+### Fixed
+
+- Added `license` key to `csp`'s `package.json`
+- Empty `csp` directives now support every directive, not just `sandbox`
+
+## 0.10.0 - 2015-07-08
+
+### Added
+
+- Add "Handling CSP violations" to `csp` readme
+- Add license to `package.json`
+
+### Changed
+
+- `hpkp` had a link to the wrong place in its readme
+- `hpkp` requires 2 or more pins
+
+### Fixed
+
+- `hpkp` might have miscalculated `maxAge` slightly wrong
+
+## 0.9.0 - 2015-04-24
+
+### Changed
+
+- `nocache` adds `private` to its `Cache-Control` directive
+- Added a description to `package.json`
+
+## 0.8.0 - 2015-04-21
+
+### Changed
+
+- Removed hefty Lodash dependency from HSTS and CSP
+- Updated string detection module in Frameguard
+- Changed readme slightly to better reflect project's focus
+
+### Deprecated
+
+- Deprecated `crossdomain` middleware
+
+### Removed
+
+- `crossdomain` is no longer a default middleware
+
+## 0.7.1 - 2015-03-23
+
+### Changed
+
+- Updated all outdated dependencies (insofar as possible)
+- HSTS now uses Lodash like all the rest of the libraries
+
+## 0.7.0 - 2015-03-05
+
+### Added
+
+- `hpkp` middleware
+
+### Changed
+
+- Travis CI should test 0.10 and 0.12
+- Minor code cleanup
+
+## 0.6.2 - 2015-03-01
+
+### Changed
+
+- Improved `xssFilter` performance
+- Updated Lodash versions
+
+## 0.6.1 - 2015-02-13
+
+### Added
+
+- "Other recommended modules" in README
+
+### Changed
+
+- Updated Lodash version
+
+### Fixed
+
+- `frameguard` middleware exported a function called `xframe`
+
+## 0.6.0 - 2015-01-21
+
+### Added
+
+- You can disable `csp` for Android
+
+### Fixed
+
+- `csp` on Chrome Mobile on Android and iOS
+
+## 0.5.4 - 2014-12-21
+
+### Changed
+
+- `nocache` should force revalidation
+
+## 0.5.3 - 2014-12-08
+
+### Changed
+
+- `platform` version in CSP and X-XSS-Protection
+
+### Fixed
+
+- Updated bad wording in frameguard docs
+
+## 0.5.2 - 2014-11-16
+
+### Changed
+
+- Updated Connect version
+
+### Fixed
+
+- Fixed minor `csp` bugfixes
+
+## 0.5.1 - 2014-11-09
+
+### Changed
+
+- Updated URLs in `package.json` for new URL
+
+### Fixed
+
+- CSP would set all headers forever after receiving an unknown user agent
+
+## 0.5.0 - 2014-10-28
+
+### Added
+
+- Most middlewares have some aliases now
+
+### Changed
+
+- `xframe` now called `frameguard` (though `xframe` still works)
+- `frameguard` chooses sameorigin by default
+- `frameguard` understands "SAME-ORIGIN" in addition to "SAMEORIGIN"
+- `nocache` removed from default middleware stack
+- Middleware split out into their own modules
+- Documentation
+- Updated supported Node version to at least 0.10.0
+- Bumped Connect version
+
+### Removed
+
+- Deprecation warnings
+
+### Fixed
+
+- Readme link was broken
+
+## 0.4.2 - 2014-10-16
+
+### Added
+
+- Support preload in HSTS header
+
+## 0.4.1 - 2014-08-24
+
+### Added
+
+- Use [helmet-crossdomain](https://github.com/helmetjs/crossdomain) to test the waters
+- 2 spaces instead of 4 throughout the code
+
+## 0.4.0 - 2014-07-17
+
+### Added
+
+- `nocache` now sets the Expires and Pragma headers
+- `nocache` now allows you to crush ETags
+
+### Changed
+
+- Improved the docs for nosniff
+- Reverted HSTS behavior of requiring a specified max-age
+
+### Fixed
+
+- Allow HSTS to have a max-age of 0
+
+## 0.3.2 - 2014-06-30
+
+### Added
+
+- All middleware functions are named
+- Throw error with non-positive HSTS max-age
+
+### Changed
+
+- Added semicolons in README
+- Make some Errors more specific
+
+### Removed
+
+- Removed all comment headers; refer to the readme
+
+### Fixed
+
+- `helmet()` was having issues
+- Fixed Syntax errors in README
+
+This changelog was created after the release of 0.3.1.
