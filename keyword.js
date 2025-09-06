@@ -1,146 +1,165 @@
-'use strict';
+/*
+  Copyright (C) 2013 Yusuke Suzuki <utatane.tea@gmail.com>
 
-var IDENTIFIER = /^[a-z_$][a-z0-9_$-]*$/i;
-var customRuleCode = require('./dotjs/custom');
-var definitionSchema = require('./definition_schema');
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are met:
 
-module.exports = {
-  add: addKeyword,
-  get: getKeyword,
-  remove: removeKeyword,
-  validate: validateKeyword
-};
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 
-/**
- * Define custom keyword
- * @this  Ajv
- * @param {String} keyword custom keyword, should be unique (including different from all standard, custom and macro keywords).
- * @param {Object} definition keyword definition object with properties `type` (type(s) which the keyword applies to), `validate` or `compile`.
- * @return {Ajv} this for method chaining
- */
-function addKeyword(keyword, definition) {
-  /* jshint validthis: true */
-  /* eslint no-shadow: 0 */
-  var RULES = this.RULES;
-  if (RULES.keywords[keyword])
-    throw new Error('Keyword ' + keyword + ' is already defined');
+(function () {
+    'use strict';
 
-  if (!IDENTIFIER.test(keyword))
-    throw new Error('Keyword ' + keyword + ' is not a valid identifier');
+    var code = require('./code');
 
-  if (definition) {
-    this.validateKeyword(definition, true);
-
-    var dataType = definition.type;
-    if (Array.isArray(dataType)) {
-      for (var i=0; i<dataType.length; i++)
-        _addRule(keyword, dataType[i], definition);
-    } else {
-      _addRule(keyword, dataType, definition);
+    function isStrictModeReservedWordES6(id) {
+        switch (id) {
+        case 'implements':
+        case 'interface':
+        case 'package':
+        case 'private':
+        case 'protected':
+        case 'public':
+        case 'static':
+        case 'let':
+            return true;
+        default:
+            return false;
+        }
     }
 
-    var metaSchema = definition.metaSchema;
-    if (metaSchema) {
-      if (definition.$data && this._opts.$data) {
-        metaSchema = {
-          anyOf: [
-            metaSchema,
-            { '$ref': 'https://raw.githubusercontent.com/ajv-validator/ajv/master/lib/refs/data.json#' }
-          ]
-        };
-      }
-      definition.validateSchema = this.compile(metaSchema, true);
-    }
-  }
-
-  RULES.keywords[keyword] = RULES.all[keyword] = true;
-
-
-  function _addRule(keyword, dataType, definition) {
-    var ruleGroup;
-    for (var i=0; i<RULES.length; i++) {
-      var rg = RULES[i];
-      if (rg.type == dataType) {
-        ruleGroup = rg;
-        break;
-      }
+    function isKeywordES5(id, strict) {
+        // yield should not be treated as keyword under non-strict mode.
+        if (!strict && id === 'yield') {
+            return false;
+        }
+        return isKeywordES6(id, strict);
     }
 
-    if (!ruleGroup) {
-      ruleGroup = { type: dataType, rules: [] };
-      RULES.push(ruleGroup);
+    function isKeywordES6(id, strict) {
+        if (strict && isStrictModeReservedWordES6(id)) {
+            return true;
+        }
+
+        switch (id.length) {
+        case 2:
+            return (id === 'if') || (id === 'in') || (id === 'do');
+        case 3:
+            return (id === 'var') || (id === 'for') || (id === 'new') || (id === 'try');
+        case 4:
+            return (id === 'this') || (id === 'else') || (id === 'case') ||
+                (id === 'void') || (id === 'with') || (id === 'enum');
+        case 5:
+            return (id === 'while') || (id === 'break') || (id === 'catch') ||
+                (id === 'throw') || (id === 'const') || (id === 'yield') ||
+                (id === 'class') || (id === 'super');
+        case 6:
+            return (id === 'return') || (id === 'typeof') || (id === 'delete') ||
+                (id === 'switch') || (id === 'export') || (id === 'import');
+        case 7:
+            return (id === 'default') || (id === 'finally') || (id === 'extends');
+        case 8:
+            return (id === 'function') || (id === 'continue') || (id === 'debugger');
+        case 10:
+            return (id === 'instanceof');
+        default:
+            return false;
+        }
     }
 
-    var rule = {
-      keyword: keyword,
-      definition: definition,
-      custom: true,
-      code: customRuleCode,
-      implements: definition.implements
+    function isReservedWordES5(id, strict) {
+        return id === 'null' || id === 'true' || id === 'false' || isKeywordES5(id, strict);
+    }
+
+    function isReservedWordES6(id, strict) {
+        return id === 'null' || id === 'true' || id === 'false' || isKeywordES6(id, strict);
+    }
+
+    function isRestrictedWord(id) {
+        return id === 'eval' || id === 'arguments';
+    }
+
+    function isIdentifierNameES5(id) {
+        var i, iz, ch;
+
+        if (id.length === 0) { return false; }
+
+        ch = id.charCodeAt(0);
+        if (!code.isIdentifierStartES5(ch)) {
+            return false;
+        }
+
+        for (i = 1, iz = id.length; i < iz; ++i) {
+            ch = id.charCodeAt(i);
+            if (!code.isIdentifierPartES5(ch)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function decodeUtf16(lead, trail) {
+        return (lead - 0xD800) * 0x400 + (trail - 0xDC00) + 0x10000;
+    }
+
+    function isIdentifierNameES6(id) {
+        var i, iz, ch, lowCh, check;
+
+        if (id.length === 0) { return false; }
+
+        check = code.isIdentifierStartES6;
+        for (i = 0, iz = id.length; i < iz; ++i) {
+            ch = id.charCodeAt(i);
+            if (0xD800 <= ch && ch <= 0xDBFF) {
+                ++i;
+                if (i >= iz) { return false; }
+                lowCh = id.charCodeAt(i);
+                if (!(0xDC00 <= lowCh && lowCh <= 0xDFFF)) {
+                    return false;
+                }
+                ch = decodeUtf16(ch, lowCh);
+            }
+            if (!check(ch)) {
+                return false;
+            }
+            check = code.isIdentifierPartES6;
+        }
+        return true;
+    }
+
+    function isIdentifierES5(id, strict) {
+        return isIdentifierNameES5(id) && !isReservedWordES5(id, strict);
+    }
+
+    function isIdentifierES6(id, strict) {
+        return isIdentifierNameES6(id) && !isReservedWordES6(id, strict);
+    }
+
+    module.exports = {
+        isKeywordES5: isKeywordES5,
+        isKeywordES6: isKeywordES6,
+        isReservedWordES5: isReservedWordES5,
+        isReservedWordES6: isReservedWordES6,
+        isRestrictedWord: isRestrictedWord,
+        isIdentifierNameES5: isIdentifierNameES5,
+        isIdentifierNameES6: isIdentifierNameES6,
+        isIdentifierES5: isIdentifierES5,
+        isIdentifierES6: isIdentifierES6
     };
-    ruleGroup.rules.push(rule);
-    RULES.custom[keyword] = rule;
-  }
-
-  return this;
-}
-
-
-/**
- * Get keyword
- * @this  Ajv
- * @param {String} keyword pre-defined or custom keyword.
- * @return {Object|Boolean} custom keyword definition, `true` if it is a predefined keyword, `false` otherwise.
- */
-function getKeyword(keyword) {
-  /* jshint validthis: true */
-  var rule = this.RULES.custom[keyword];
-  return rule ? rule.definition : this.RULES.keywords[keyword] || false;
-}
-
-
-/**
- * Remove keyword
- * @this  Ajv
- * @param {String} keyword pre-defined or custom keyword.
- * @return {Ajv} this for method chaining
- */
-function removeKeyword(keyword) {
-  /* jshint validthis: true */
-  var RULES = this.RULES;
-  delete RULES.keywords[keyword];
-  delete RULES.all[keyword];
-  delete RULES.custom[keyword];
-  for (var i=0; i<RULES.length; i++) {
-    var rules = RULES[i].rules;
-    for (var j=0; j<rules.length; j++) {
-      if (rules[j].keyword == keyword) {
-        rules.splice(j, 1);
-        break;
-      }
-    }
-  }
-  return this;
-}
-
-
-/**
- * Validate keyword definition
- * @this  Ajv
- * @param {Object} definition keyword definition object.
- * @param {Boolean} throwError true to throw exception if definition is invalid
- * @return {boolean} validation result
- */
-function validateKeyword(definition, throwError) {
-  validateKeyword.errors = null;
-  var v = this._validateKeyword = this._validateKeyword
-                                  || this.compile(definitionSchema, true);
-
-  if (v(definition)) return true;
-  validateKeyword.errors = v.errors;
-  if (throwError)
-    throw new Error('custom keyword definition is invalid: '  + this.errorsText(v.errors));
-  else
-    return false;
-}
+}());
+/* vim: set sw=4 ts=4 et tw=80 : */

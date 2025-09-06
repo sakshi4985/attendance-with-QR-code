@@ -1,7 +1,4 @@
-"use strict";
+'use strict';
 
-const RuleTester = require("./rule-tester");
-
-module.exports = {
-	RuleTester,
-};
+/** @type {import('.')} */
+module.exports = Object;
