@@ -3,13 +3,15 @@
  * @author JoshuaKGoldberg
  */
 
+"use strict";
+
 /**
  * Check if the variable contains an object strictly rejecting arrays
  * @param {unknown} value an object
  * @returns {boolean} Whether value is an object
  */
 function isObjectNotArray(value) {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
+	return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 /**
@@ -19,40 +21,42 @@ function isObjectNotArray(value) {
  * @returns {T | U | (T & U)} Merged equivalent of second on top of first.
  */
 function deepMergeObjects(first, second) {
-    if (second === void 0) {
-        return first;
-    }
+	if (second === void 0) {
+		return first;
+	}
 
-    if (!isObjectNotArray(first) || !isObjectNotArray(second)) {
-        return second;
-    }
+	if (!isObjectNotArray(first) || !isObjectNotArray(second)) {
+		return second;
+	}
 
-    const result = { ...first, ...second };
+	const result = { ...first, ...second };
 
-    for (const key of Object.keys(second)) {
-        if (Object.prototype.propertyIsEnumerable.call(first, key)) {
-            result[key] = deepMergeObjects(first[key], second[key]);
-        }
-    }
+	for (const key of Object.keys(second)) {
+		if (Object.prototype.propertyIsEnumerable.call(first, key)) {
+			result[key] = deepMergeObjects(first[key], second[key]);
+		}
+	}
 
-    return result;
+	return result;
 }
 
 /**
  * Deeply merges second on top of first, creating a new [] array if needed.
- * @param {T[] | undefined} first Base, default values.
- * @param {U[] | undefined} second User-specified values.
+ * @param {T[]} first Base, default values.
+ * @param {U[]} second User-specified values.
  * @returns {(T | U | (T & U))[]} Merged equivalent of second on top of first.
  */
 function deepMergeArrays(first, second) {
-    if (!first || !second) {
-        return second || first || [];
-    }
+	if (!first || !second) {
+		return second || first || [];
+	}
 
-    return [
-        ...first.map((value, i) => deepMergeObjects(value, second[i])),
-        ...second.slice(first.length)
-    ];
+	return [
+		...first.map((value, i) =>
+			deepMergeObjects(value, i < second.length ? second[i] : void 0),
+		),
+		...second.slice(first.length),
+	];
 }
 
-export { deepMergeArrays };
+module.exports = { deepMergeArrays };
