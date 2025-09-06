@@ -1,615 +1,452 @@
 // @ts-self-types="./index.d.ts"
-import levn from 'levn';
-
 /**
- * @fileoverview Config Comment Parser
- * @author Nicholas C. Zakas
+ * @fileoverview Merge Strategy
  */
-
 
 //-----------------------------------------------------------------------------
-// Type Definitions
+// Class
 //-----------------------------------------------------------------------------
 
-/** @typedef {import("@eslint/core").RuleConfig} RuleConfig */
-/** @typedef {import("@eslint/core").RulesConfig} RulesConfig */
-/** @typedef {import("./types.ts").StringConfig} StringConfig */
-/** @typedef {import("./types.ts").BooleanConfig} BooleanConfig */
-
-//-----------------------------------------------------------------------------
-// Helpers
-//-----------------------------------------------------------------------------
-
-const directivesPattern = /^([a-z]+(?:-[a-z]+)*)(?:\s|$)/u;
-const validSeverities = new Set([0, 1, 2, "off", "warn", "error"]);
-
 /**
- * Determines if the severity in the rule configuration is valid.
- * @param {RuleConfig} ruleConfig A rule's configuration.
- * @returns {boolean} `true` if the severity is valid, otherwise `false`.
+ * Container class for several different merge strategies.
  */
-function isSeverityValid(ruleConfig) {
-	const severity = Array.isArray(ruleConfig) ? ruleConfig[0] : ruleConfig;
-	return validSeverities.has(severity);
-}
-
-/**
- * Determines if all severities in the rules configuration are valid.
- * @param {RulesConfig} rulesConfig The rules configuration to check.
- * @returns {boolean} `true` if all severities are valid, otherwise `false`.
- */
-function isEverySeverityValid(rulesConfig) {
-	return Object.values(rulesConfig).every(isSeverityValid);
-}
-
-/**
- * Represents a directive comment.
- */
-class DirectiveComment {
+class MergeStrategy {
 	/**
-	 * The label of the directive, such as "eslint", "eslint-disable", etc.
-	 * @type {string}
+	 * Merges two keys by overwriting the first with the second.
+	 * @param {*} value1 The value from the first object key.
+	 * @param {*} value2 The value from the second object key.
+	 * @returns {*} The second value.
 	 */
-	label = "";
-
-	/**
-	 * The value of the directive (the string after the label).
-	 * @type {string}
-	 */
-	value = "";
-
-	/**
-	 * The justification of the directive (the string after the --).
-	 * @type {string}
-	 */
-	justification = "";
-
-	/**
-	 * Creates a new directive comment.
-	 * @param {string} label The label of the directive.
-	 * @param {string} value The value of the directive.
-	 * @param {string} justification The justification of the directive.
-	 */
-	constructor(label, value, justification) {
-		this.label = label;
-		this.value = value;
-		this.justification = justification;
-	}
-}
-
-//------------------------------------------------------------------------------
-// Public Interface
-//------------------------------------------------------------------------------
-
-/**
- * Object to parse ESLint configuration comments.
- */
-class ConfigCommentParser {
-	/**
-	 * Parses a list of "name:string_value" or/and "name" options divided by comma or
-	 * whitespace. Used for "global" comments.
-	 * @param {string} string The string to parse.
-	 * @returns {StringConfig} Result map object of names and string values, or null values if no value was provided.
-	 */
-	parseStringConfig(string) {
-		const items = /** @type {StringConfig} */ ({});
-
-		// Collapse whitespace around `:` and `,` to make parsing easier
-		const trimmedString = string
-			.trim()
-			.replace(/(?<!\s)\s*([:,])\s*/gu, "$1");
-
-		trimmedString.split(/\s|,+/u).forEach(name => {
-			if (!name) {
-				return;
-			}
-
-			// value defaults to null (if not provided), e.g: "foo" => ["foo", null]
-			const [key, value = null] = name.split(":");
-
-			items[key] = value;
-		});
-
-		return items;
+	static overwrite(value1, value2) {
+		return value2;
 	}
 
 	/**
-	 * Parses a JSON-like config.
-	 * @param {string} string The string to parse.
-	 * @returns {({ok: true, config: RulesConfig}|{ok: false, error: {message: string}})} Result map object
+	 * Merges two keys by replacing the first with the second only if the
+	 * second is defined.
+	 * @param {*} value1 The value from the first object key.
+	 * @param {*} value2 The value from the second object key.
+	 * @returns {*} The second value if it is defined.
 	 */
-	parseJSONLikeConfig(string) {
-		// Parses a JSON-like comment by the same way as parsing CLI option.
-		try {
-			const items =
-				/** @type {RulesConfig} */ (levn.parse("Object", string)) || {};
-
-			/*
-			 * When the configuration has any invalid severities, it should be completely
-			 * ignored. This is because the configuration is not valid and should not be
-			 * applied.
-			 *
-			 * For example, the following configuration is invalid:
-			 *
-			 *    "no-alert: 2 no-console: 2"
-			 *
-			 * This results in a configuration of { "no-alert": "2 no-console: 2" }, which is
-			 * not valid. In this case, the configuration should be ignored.
-			 */
-			if (isEverySeverityValid(items)) {
-				return {
-					ok: true,
-					config: items,
-				};
-			}
-		} catch {
-			// levn parsing error: ignore to parse the string by a fallback.
+	static replace(value1, value2) {
+		if (typeof value2 !== "undefined") {
+			return value2;
 		}
 
-		/*
-		 * Optionator cannot parse commaless notations.
-		 * But we are supporting that. So this is a fallback for that.
-		 */
-		const normalizedString = string
-			.replace(/(?<![-a-zA-Z0-9/])([-a-zA-Z0-9/]+):/gu, '"$1":')
-			.replace(/(\]|[0-9])\s+(?=")/u, "$1,");
+		return value1;
+	}
 
-		try {
-			const items = JSON.parse(`{${normalizedString}}`);
+	/**
+	 * Merges two properties by assigning properties from the second to the first.
+	 * @param {*} value1 The value from the first object key.
+	 * @param {*} value2 The value from the second object key.
+	 * @returns {*} A new object containing properties from both value1 and
+	 *      value2.
+	 */
+	static assign(value1, value2) {
+		return Object.assign({}, value1, value2);
+	}
+}
 
-			return {
-				ok: true,
-				config: items,
-			};
-		} catch (ex) {
-			const errorMessage = ex instanceof Error ? ex.message : String(ex);
+/**
+ * @fileoverview Validation Strategy
+ */
 
-			return {
-				ok: false,
-				error: {
-					message: `Failed to parse JSON from '${normalizedString}': ${errorMessage}`,
-				},
-			};
+//-----------------------------------------------------------------------------
+// Class
+//-----------------------------------------------------------------------------
+
+/**
+ * Container class for several different validation strategies.
+ */
+class ValidationStrategy {
+	/**
+	 * Validates that a value is an array.
+	 * @param {*} value The value to validate.
+	 * @returns {void}
+	 * @throws {TypeError} If the value is invalid.
+	 */
+	static array(value) {
+		if (!Array.isArray(value)) {
+			throw new TypeError("Expected an array.");
 		}
 	}
 
 	/**
-	 * Parses a config of values separated by comma.
-	 * @param {string} string The string to parse.
-	 * @returns {BooleanConfig} Result map of values and true values
+	 * Validates that a value is a boolean.
+	 * @param {*} value The value to validate.
+	 * @returns {void}
+	 * @throws {TypeError} If the value is invalid.
 	 */
-	parseListConfig(string) {
-		const items = /** @type {BooleanConfig} */ ({});
-
-		string.split(",").forEach(name => {
-			const trimmedName = name
-				.trim()
-				.replace(
-					/^(?<quote>['"]?)(?<ruleId>.*)\k<quote>$/su,
-					"$<ruleId>",
-				);
-
-			if (trimmedName) {
-				items[trimmedName] = true;
-			}
-		});
-
-		return items;
+	static boolean(value) {
+		if (typeof value !== "boolean") {
+			throw new TypeError("Expected a Boolean.");
+		}
 	}
 
 	/**
-	 * Extract the directive and the justification from a given directive comment and trim them.
-	 * @param {string} value The comment text to extract.
-	 * @returns {{directivePart: string, justificationPart: string}} The extracted directive and justification.
+	 * Validates that a value is a number.
+	 * @param {*} value The value to validate.
+	 * @returns {void}
+	 * @throws {TypeError} If the value is invalid.
 	 */
-	#extractDirectiveComment(value) {
-		const match = /\s-{2,}\s/u.exec(value);
-
-		if (!match) {
-			return { directivePart: value.trim(), justificationPart: "" };
+	static number(value) {
+		if (typeof value !== "number") {
+			throw new TypeError("Expected a number.");
 		}
-
-		const directive = value.slice(0, match.index).trim();
-		const justification = value.slice(match.index + match[0].length).trim();
-
-		return { directivePart: directive, justificationPart: justification };
 	}
 
 	/**
-	 * Parses a directive comment into directive text and value.
-	 * @param {string} string The string with the directive to be parsed.
-	 * @returns {DirectiveComment|undefined} The parsed directive or `undefined` if the directive is invalid.
+	 * Validates that a value is a object.
+	 * @param {*} value The value to validate.
+	 * @returns {void}
+	 * @throws {TypeError} If the value is invalid.
 	 */
-	parseDirective(string) {
-		const { directivePart, justificationPart } =
-			this.#extractDirectiveComment(string);
-		const match = directivesPattern.exec(directivePart);
-
-		if (!match) {
-			return undefined;
+	static object(value) {
+		if (!value || typeof value !== "object") {
+			throw new TypeError("Expected an object.");
 		}
+	}
 
-		const directiveText = match[1];
-		const directiveValue = directivePart.slice(
-			match.index + directiveText.length,
-		);
+	/**
+	 * Validates that a value is a object or null.
+	 * @param {*} value The value to validate.
+	 * @returns {void}
+	 * @throws {TypeError} If the value is invalid.
+	 */
+	static "object?"(value) {
+		if (typeof value !== "object") {
+			throw new TypeError("Expected an object or null.");
+		}
+	}
 
-		return new DirectiveComment(
-			directiveText,
-			directiveValue.trim(),
-			justificationPart,
-		);
+	/**
+	 * Validates that a value is a string.
+	 * @param {*} value The value to validate.
+	 * @returns {void}
+	 * @throws {TypeError} If the value is invalid.
+	 */
+	static string(value) {
+		if (typeof value !== "string") {
+			throw new TypeError("Expected a string.");
+		}
+	}
+
+	/**
+	 * Validates that a value is a non-empty string.
+	 * @param {*} value The value to validate.
+	 * @returns {void}
+	 * @throws {TypeError} If the value is invalid.
+	 */
+	static "string!"(value) {
+		if (typeof value !== "string" || value.length === 0) {
+			throw new TypeError("Expected a non-empty string.");
+		}
 	}
 }
 
 /**
- * @fileoverview A collection of helper classes for implementing `SourceCode`.
- * @author Nicholas C. Zakas
+ * @fileoverview Object Schema
  */
 
-/* eslint class-methods-use-this: off -- Required to complete interface. */
 
 //-----------------------------------------------------------------------------
-// Type Definitions
+// Types
 //-----------------------------------------------------------------------------
 
-/** @typedef {import("@eslint/core").VisitTraversalStep} VisitTraversalStep */
-/** @typedef {import("@eslint/core").CallTraversalStep} CallTraversalStep */
-/** @typedef {import("@eslint/core").TraversalStep} TraversalStep */
-/** @typedef {import("@eslint/core").SourceLocation} SourceLocation */
-/** @typedef {import("@eslint/core").SourceLocationWithOffset} SourceLocationWithOffset */
-/** @typedef {import("@eslint/core").SourceRange} SourceRange */
-/** @typedef {import("@eslint/core").Directive} IDirective */
-/** @typedef {import("@eslint/core").DirectiveType} DirectiveType */
-/** @typedef {import("@eslint/core").SourceCodeBaseTypeOptions} SourceCodeBaseTypeOptions */
-/**
- * @typedef {import("@eslint/core").TextSourceCode<Options>} TextSourceCode<Options>
- * @template {SourceCodeBaseTypeOptions} [Options=SourceCodeBaseTypeOptions]
- */
+/** @typedef {import("./types.ts").ObjectDefinition} ObjectDefinition */
+/** @typedef {import("./types.ts").PropertyDefinition} PropertyDefinition */
 
 //-----------------------------------------------------------------------------
-// Helpers
+// Private
 //-----------------------------------------------------------------------------
 
 /**
- * Determines if a node has ESTree-style loc information.
- * @param {object} node The node to check.
- * @returns {node is {loc:SourceLocation}} `true` if the node has ESTree-style loc information, `false` if not.
+ * Validates a schema strategy.
+ * @param {string} name The name of the key this strategy is for.
+ * @param {PropertyDefinition} definition The strategy for the object key.
+ * @returns {void}
+ * @throws {Error} When the strategy is missing a name.
+ * @throws {Error} When the strategy is missing a merge() method.
+ * @throws {Error} When the strategy is missing a validate() method.
  */
-function hasESTreeStyleLoc(node) {
-	return "loc" in node;
-}
-
-/**
- * Determines if a node has position-style loc information.
- * @param {object} node The node to check.
- * @returns {node is {position:SourceLocation}} `true` if the node has position-style range information, `false` if not.
- */
-function hasPosStyleLoc(node) {
-	return "position" in node;
-}
-
-/**
- * Determines if a node has ESTree-style range information.
- * @param {object} node The node to check.
- * @returns {node is {range:SourceRange}} `true` if the node has ESTree-style range information, `false` if not.
- */
-function hasESTreeStyleRange(node) {
-	return "range" in node;
-}
-
-/**
- * Determines if a node has position-style range information.
- * @param {object} node The node to check.
- * @returns {node is {position:SourceLocationWithOffset}} `true` if the node has position-style range information, `false` if not.
- */
-function hasPosStyleRange(node) {
-	return "position" in node;
-}
-
-//-----------------------------------------------------------------------------
-// Exports
-//-----------------------------------------------------------------------------
-
-/**
- * A class to represent a step in the traversal process where a node is visited.
- * @implements {VisitTraversalStep}
- */
-class VisitNodeStep {
-	/**
-	 * The type of the step.
-	 * @type {"visit"}
-	 * @readonly
-	 */
-	type = "visit";
-
-	/**
-	 * The kind of the step. Represents the same data as the `type` property
-	 * but it's a number for performance.
-	 * @type {1}
-	 * @readonly
-	 */
-	kind = 1;
-
-	/**
-	 * The target of the step.
-	 * @type {object}
-	 */
-	target;
-
-	/**
-	 * The phase of the step.
-	 * @type {1|2}
-	 */
-	phase;
-
-	/**
-	 * The arguments of the step.
-	 * @type {Array<any>}
-	 */
-	args;
-
-	/**
-	 * Creates a new instance.
-	 * @param {Object} options The options for the step.
-	 * @param {object} options.target The target of the step.
-	 * @param {1|2} options.phase The phase of the step.
-	 * @param {Array<any>} options.args The arguments of the step.
-	 */
-	constructor({ target, phase, args }) {
-		this.target = target;
-		this.phase = phase;
-		this.args = args;
-	}
-}
-
-/**
- * A class to represent a step in the traversal process where a
- * method is called.
- * @implements {CallTraversalStep}
- */
-class CallMethodStep {
-	/**
-	 * The type of the step.
-	 * @type {"call"}
-	 * @readonly
-	 */
-	type = "call";
-
-	/**
-	 * The kind of the step. Represents the same data as the `type` property
-	 * but it's a number for performance.
-	 * @type {2}
-	 * @readonly
-	 */
-	kind = 2;
-
-	/**
-	 * The name of the method to call.
-	 * @type {string}
-	 */
-	target;
-
-	/**
-	 * The arguments to pass to the method.
-	 * @type {Array<any>}
-	 */
-	args;
-
-	/**
-	 * Creates a new instance.
-	 * @param {Object} options The options for the step.
-	 * @param {string} options.target The target of the step.
-	 * @param {Array<any>} options.args The arguments of the step.
-	 */
-	constructor({ target, args }) {
-		this.target = target;
-		this.args = args;
-	}
-}
-
-/**
- * A class to represent a directive comment.
- * @implements {IDirective}
- */
-class Directive {
-	/**
-	 * The type of directive.
-	 * @type {DirectiveType}
-	 * @readonly
-	 */
-	type;
-
-	/**
-	 * The node representing the directive.
-	 * @type {unknown}
-	 * @readonly
-	 */
-	node;
-
-	/**
-	 * Everything after the "eslint-disable" portion of the directive,
-	 * but before the "--" that indicates the justification.
-	 * @type {string}
-	 * @readonly
-	 */
-	value;
-
-	/**
-	 * The justification for the directive.
-	 * @type {string}
-	 * @readonly
-	 */
-	justification;
-
-	/**
-	 * Creates a new instance.
-	 * @param {Object} options The options for the directive.
-	 * @param {"disable"|"enable"|"disable-next-line"|"disable-line"} options.type The type of directive.
-	 * @param {unknown} options.node The node representing the directive.
-	 * @param {string} options.value The value of the directive.
-	 * @param {string} options.justification The justification for the directive.
-	 */
-	constructor({ type, node, value, justification }) {
-		this.type = type;
-		this.node = node;
-		this.value = value;
-		this.justification = justification;
-	}
-}
-
-/**
- * Source Code Base Object
- * @template {SourceCodeBaseTypeOptions & {SyntaxElementWithLoc: object}} [Options=SourceCodeBaseTypeOptions & {SyntaxElementWithLoc: object}]
- * @implements {TextSourceCode<Options>}
- */
-class TextSourceCodeBase {
-	/**
-	 * The lines of text in the source code.
-	 * @type {Array<string>}
-	 */
-	#lines;
-
-	/**
-	 * The AST of the source code.
-	 * @type {Options['RootNode']}
-	 */
-	ast;
-
-	/**
-	 * The text of the source code.
-	 * @type {string}
-	 */
-	text;
-
-	/**
-	 * Creates a new instance.
-	 * @param {Object} options The options for the instance.
-	 * @param {string} options.text The source code text.
-	 * @param {Options['RootNode']} options.ast The root AST node.
-	 * @param {RegExp} [options.lineEndingPattern] The pattern to match lineEndings in the source code.
-	 */
-	constructor({ text, ast, lineEndingPattern = /\r?\n/u }) {
-		this.ast = ast;
-		this.text = text;
-		this.#lines = text.split(lineEndingPattern);
-	}
-
-	/**
-	 * Returns the loc information for the given node or token.
-	 * @param {Options['SyntaxElementWithLoc']} nodeOrToken The node or token to get the loc information for.
-	 * @returns {SourceLocation} The loc information for the node or token.
-	 * @throws {Error} If the node or token does not have loc information.
-	 */
-	getLoc(nodeOrToken) {
-		if (hasESTreeStyleLoc(nodeOrToken)) {
-			return nodeOrToken.loc;
+function validateDefinition(name, definition) {
+	let hasSchema = false;
+	if (definition.schema) {
+		if (typeof definition.schema === "object") {
+			hasSchema = true;
+		} else {
+			throw new TypeError("Schema must be an object.");
 		}
-
-		if (hasPosStyleLoc(nodeOrToken)) {
-			return nodeOrToken.position;
-		}
-
-		throw new Error(
-			"Custom getLoc() method must be implemented in the subclass.",
-		);
 	}
 
-	/**
-	 * Returns the range information for the given node or token.
-	 * @param {Options['SyntaxElementWithLoc']} nodeOrToken The node or token to get the range information for.
-	 * @returns {SourceRange} The range information for the node or token.
-	 * @throws {Error} If the node or token does not have range information.
-	 */
-	getRange(nodeOrToken) {
-		if (hasESTreeStyleRange(nodeOrToken)) {
-			return nodeOrToken.range;
-		}
-
-		if (hasPosStyleRange(nodeOrToken)) {
-			return [
-				nodeOrToken.position.start.offset,
-				nodeOrToken.position.end.offset,
-			];
-		}
-
-		throw new Error(
-			"Custom getRange() method must be implemented in the subclass.",
-		);
-	}
-
-	/* eslint-disable no-unused-vars -- Required to complete interface. */
-	/**
-	 * Returns the parent of the given node.
-	 * @param {Options['SyntaxElementWithLoc']} node The node to get the parent of.
-	 * @returns {Options['SyntaxElementWithLoc']|undefined} The parent of the node.
-	 * @throws {Error} If the method is not implemented in the subclass.
-	 */
-	getParent(node) {
-		throw new Error("Not implemented.");
-	}
-	/* eslint-enable no-unused-vars -- Required to complete interface. */
-
-	/**
-	 * Gets all the ancestors of a given node
-	 * @param {Options['SyntaxElementWithLoc']} node The node
-	 * @returns {Array<Options['SyntaxElementWithLoc']>} All the ancestor nodes in the AST, not including the provided node, starting
-	 * from the root node at index 0 and going inwards to the parent node.
-	 * @throws {TypeError} When `node` is missing.
-	 */
-	getAncestors(node) {
-		if (!node) {
-			throw new TypeError("Missing required argument: node.");
-		}
-
-		const ancestorsStartingAtParent = [];
-
-		for (
-			let ancestor = this.getParent(node);
-			ancestor;
-			ancestor = this.getParent(ancestor)
-		) {
-			ancestorsStartingAtParent.push(ancestor);
-		}
-
-		return ancestorsStartingAtParent.reverse();
-	}
-
-	/**
-	 * Gets the source code for the given node.
-	 * @param {Options['SyntaxElementWithLoc']} [node] The AST node to get the text for.
-	 * @param {number} [beforeCount] The number of characters before the node to retrieve.
-	 * @param {number} [afterCount] The number of characters after the node to retrieve.
-	 * @returns {string} The text representing the AST node.
-	 * @public
-	 */
-	getText(node, beforeCount, afterCount) {
-		if (node) {
-			const range = this.getRange(node);
-			return this.text.slice(
-				Math.max(range[0] - (beforeCount || 0), 0),
-				range[1] + (afterCount || 0),
+	if (typeof definition.merge === "string") {
+		if (!(definition.merge in MergeStrategy)) {
+			throw new TypeError(
+				`Definition for key "${name}" missing valid merge strategy.`,
 			);
 		}
-		return this.text;
+	} else if (!hasSchema && typeof definition.merge !== "function") {
+		throw new TypeError(
+			`Definition for key "${name}" must have a merge property.`,
+		);
 	}
 
-	/**
-	 * Gets the entire source text split into an array of lines.
-	 * @returns {Array<string>} The source text as an array of lines.
-	 * @public
-	 */
-	get lines() {
-		return this.#lines;
-	}
-
-	/**
-	 * Traverse the source code and return the steps that were taken.
-	 * @returns {Iterable<TraversalStep>} The steps that were taken while traversing the source code.
-	 */
-	traverse() {
-		throw new Error("Not implemented.");
+	if (typeof definition.validate === "string") {
+		if (!(definition.validate in ValidationStrategy)) {
+			throw new TypeError(
+				`Definition for key "${name}" missing valid validation strategy.`,
+			);
+		}
+	} else if (!hasSchema && typeof definition.validate !== "function") {
+		throw new TypeError(
+			`Definition for key "${name}" must have a validate() method.`,
+		);
 	}
 }
 
-export { CallMethodStep, ConfigCommentParser, Directive, TextSourceCodeBase, VisitNodeStep };
+//-----------------------------------------------------------------------------
+// Errors
+//-----------------------------------------------------------------------------
+
+/**
+ * Error when an unexpected key is found.
+ */
+class UnexpectedKeyError extends Error {
+	/**
+	 * Creates a new instance.
+	 * @param {string} key The key that was unexpected.
+	 */
+	constructor(key) {
+		super(`Unexpected key "${key}" found.`);
+	}
+}
+
+/**
+ * Error when a required key is missing.
+ */
+class MissingKeyError extends Error {
+	/**
+	 * Creates a new instance.
+	 * @param {string} key The key that was missing.
+	 */
+	constructor(key) {
+		super(`Missing required key "${key}".`);
+	}
+}
+
+/**
+ * Error when a key requires other keys that are missing.
+ */
+class MissingDependentKeysError extends Error {
+	/**
+	 * Creates a new instance.
+	 * @param {string} key The key that was unexpected.
+	 * @param {Array<string>} requiredKeys The keys that are required.
+	 */
+	constructor(key, requiredKeys) {
+		super(`Key "${key}" requires keys "${requiredKeys.join('", "')}".`);
+	}
+}
+
+/**
+ * Wrapper error for errors occuring during a merge or validate operation.
+ */
+class WrapperError extends Error {
+	/**
+	 * Creates a new instance.
+	 * @param {string} key The object key causing the error.
+	 * @param {Error} source The source error.
+	 */
+	constructor(key, source) {
+		super(`Key "${key}": ${source.message}`, { cause: source });
+
+		// copy over custom properties that aren't represented
+		for (const sourceKey of Object.keys(source)) {
+			if (!(sourceKey in this)) {
+				this[sourceKey] = source[sourceKey];
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Main
+//-----------------------------------------------------------------------------
+
+/**
+ * Represents an object validation/merging schema.
+ */
+class ObjectSchema {
+	/**
+	 * Track all definitions in the schema by key.
+	 * @type {Map<string, PropertyDefinition>}
+	 */
+	#definitions = new Map();
+
+	/**
+	 * Separately track any keys that are required for faster validtion.
+	 * @type {Map<string, PropertyDefinition>}
+	 */
+	#requiredKeys = new Map();
+
+	/**
+	 * Creates a new instance.
+	 * @param {ObjectDefinition} definitions The schema definitions.
+	 */
+	constructor(definitions) {
+		if (!definitions) {
+			throw new Error("Schema definitions missing.");
+		}
+
+		// add in all strategies
+		for (const key of Object.keys(definitions)) {
+			validateDefinition(key, definitions[key]);
+
+			// normalize merge and validate methods if subschema is present
+			if (typeof definitions[key].schema === "object") {
+				const schema = new ObjectSchema(definitions[key].schema);
+				definitions[key] = {
+					...definitions[key],
+					merge(first = {}, second = {}) {
+						return schema.merge(first, second);
+					},
+					validate(value) {
+						ValidationStrategy.object(value);
+						schema.validate(value);
+					},
+				};
+			}
+
+			// normalize the merge method in case there's a string
+			if (typeof definitions[key].merge === "string") {
+				definitions[key] = {
+					...definitions[key],
+					merge: MergeStrategy[
+						/** @type {string} */ (definitions[key].merge)
+					],
+				};
+			}
+
+			// normalize the validate method in case there's a string
+			if (typeof definitions[key].validate === "string") {
+				definitions[key] = {
+					...definitions[key],
+					validate:
+						ValidationStrategy[
+							/** @type {string} */ (definitions[key].validate)
+						],
+				};
+			}
+
+			this.#definitions.set(key, definitions[key]);
+
+			if (definitions[key].required) {
+				this.#requiredKeys.set(key, definitions[key]);
+			}
+		}
+	}
+
+	/**
+	 * Determines if a strategy has been registered for the given object key.
+	 * @param {string} key The object key to find a strategy for.
+	 * @returns {boolean} True if the key has a strategy registered, false if not.
+	 */
+	hasKey(key) {
+		return this.#definitions.has(key);
+	}
+
+	/**
+	 * Merges objects together to create a new object comprised of the keys
+	 * of the all objects. Keys are merged based on the each key's merge
+	 * strategy.
+	 * @param {...Object} objects The objects to merge.
+	 * @returns {Object} A new object with a mix of all objects' keys.
+	 * @throws {Error} If any object is invalid.
+	 */
+	merge(...objects) {
+		// double check arguments
+		if (objects.length < 2) {
+			throw new TypeError("merge() requires at least two arguments.");
+		}
+
+		if (
+			objects.some(
+				object => object === null || typeof object !== "object",
+			)
+		) {
+			throw new TypeError("All arguments must be objects.");
+		}
+
+		return objects.reduce((result, object) => {
+			this.validate(object);
+
+			for (const [key, strategy] of this.#definitions) {
+				try {
+					if (key in result || key in object) {
+						const merge = /** @type {Function} */ (strategy.merge);
+						const value = merge.call(
+							this,
+							result[key],
+							object[key],
+						);
+						if (value !== undefined) {
+							result[key] = value;
+						}
+					}
+				} catch (ex) {
+					throw new WrapperError(key, ex);
+				}
+			}
+			return result;
+		}, {});
+	}
+
+	/**
+	 * Validates an object's keys based on the validate strategy for each key.
+	 * @param {Object} object The object to validate.
+	 * @returns {void}
+	 * @throws {Error} When the object is invalid.
+	 */
+	validate(object) {
+		// check existing keys first
+		for (const key of Object.keys(object)) {
+			// check to see if the key is defined
+			if (!this.hasKey(key)) {
+				throw new UnexpectedKeyError(key);
+			}
+
+			// validate existing keys
+			const definition = this.#definitions.get(key);
+
+			// first check to see if any other keys are required
+			if (Array.isArray(definition.requires)) {
+				if (
+					!definition.requires.every(otherKey => otherKey in object)
+				) {
+					throw new MissingDependentKeysError(
+						key,
+						definition.requires,
+					);
+				}
+			}
+
+			// now apply remaining validation strategy
+			try {
+				const validate = /** @type {Function} */ (definition.validate);
+				validate.call(definition, object[key]);
+			} catch (ex) {
+				throw new WrapperError(key, ex);
+			}
+		}
+
+		// ensure required keys aren't missing
+		for (const [key] of this.#requiredKeys) {
+			if (!(key in object)) {
+				throw new MissingKeyError(key);
+			}
+		}
+	}
+}
+
+export { MergeStrategy, ObjectSchema, ValidationStrategy };
