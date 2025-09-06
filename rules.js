@@ -1,66 +1,71 @@
-'use strict';
+/**
+ * @fileoverview Defines a storage for rules.
+ * @author Nicholas C. Zakas
+ * @author aladdin-add
+ */
 
-var ruleModules = require('../dotjs')
-  , toHash = require('./util').toHash;
+"use strict";
 
-module.exports = function rules() {
-  var RULES = [
-    { type: 'number',
-      rules: [ { 'maximum': ['exclusiveMaximum'] },
-               { 'minimum': ['exclusiveMinimum'] }, 'multipleOf', 'format'] },
-    { type: 'string',
-      rules: [ 'maxLength', 'minLength', 'pattern', 'format' ] },
-    { type: 'array',
-      rules: [ 'maxItems', 'minItems', 'items', 'contains', 'uniqueItems' ] },
-    { type: 'object',
-      rules: [ 'maxProperties', 'minProperties', 'required', 'dependencies', 'propertyNames',
-               { 'properties': ['additionalProperties', 'patternProperties'] } ] },
-    { rules: [ '$ref', 'const', 'enum', 'not', 'anyOf', 'oneOf', 'allOf', 'if' ] }
-  ];
+//------------------------------------------------------------------------------
+// Requirements
+//------------------------------------------------------------------------------
 
-  var ALL = [ 'type', '$comment' ];
-  var KEYWORDS = [
-    '$schema', '$id', 'id', '$data', '$async', 'title',
-    'description', 'default', 'definitions',
-    'examples', 'readOnly', 'writeOnly',
-    'contentMediaType', 'contentEncoding',
-    'additionalItems', 'then', 'else'
-  ];
-  var TYPES = [ 'number', 'integer', 'string', 'array', 'object', 'boolean', 'null' ];
-  RULES.all = toHash(ALL);
-  RULES.types = toHash(TYPES);
+const builtInRules = require("../rules");
 
-  RULES.forEach(function (group) {
-    group.rules = group.rules.map(function (keyword) {
-      var implKeywords;
-      if (typeof keyword == 'object') {
-        var key = Object.keys(keyword)[0];
-        implKeywords = keyword[key];
-        keyword = key;
-        implKeywords.forEach(function (k) {
-          ALL.push(k);
-          RULES.all[k] = true;
-        });
-      }
-      ALL.push(keyword);
-      var rule = RULES.all[keyword] = {
-        keyword: keyword,
-        code: ruleModules[keyword],
-        implements: implKeywords
-      };
-      return rule;
-    });
+//------------------------------------------------------------------------------
+// Typedefs
+//------------------------------------------------------------------------------
 
-    RULES.all.$comment = {
-      keyword: '$comment',
-      code: ruleModules.$comment
-    };
+/** @typedef {import("../types").Rule.RuleModule} Rule */
 
-    if (group.type) RULES.types[group.type] = group;
-  });
+//------------------------------------------------------------------------------
+// Public Interface
+//------------------------------------------------------------------------------
 
-  RULES.keywords = toHash(ALL.concat(KEYWORDS));
-  RULES.custom = {};
+/**
+ * A storage for rules.
+ */
+class Rules {
+	constructor() {
+		this._rules = Object.create(null);
+	}
 
-  return RULES;
-};
+	/**
+	 * Registers a rule module for rule id in storage.
+	 * @param {string} ruleId Rule id (file name).
+	 * @param {Rule} rule Rule object.
+	 * @returns {void}
+	 */
+	define(ruleId, rule) {
+		this._rules[ruleId] = rule;
+	}
+
+	/**
+	 * Access rule handler by id (file name).
+	 * @param {string} ruleId Rule id (file name).
+	 * @returns {Rule} Rule object.
+	 */
+	get(ruleId) {
+		if (typeof this._rules[ruleId] === "string") {
+			this.define(ruleId, require(this._rules[ruleId]));
+		}
+		if (this._rules[ruleId]) {
+			return this._rules[ruleId];
+		}
+		if (builtInRules.has(ruleId)) {
+			return builtInRules.get(ruleId);
+		}
+
+		return null;
+	}
+
+	*[Symbol.iterator]() {
+		yield* builtInRules;
+
+		for (const ruleId of Object.keys(this._rules)) {
+			yield [ruleId, this.get(ruleId)];
+		}
+	}
+}
+
+module.exports = Rules;
