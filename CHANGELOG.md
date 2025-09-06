@@ -1,54 +1,24 @@
-# 1.0.0 - 2016-01-07
+# Changelog
 
-- Removed: unused speed test
-- Added: Automatic routing between previously unsupported conversions
-([#27](https://github.com/Qix-/color-convert/pull/27))
-- Removed: `xxx2xxx()` and `xxx2xxxRaw()` functions
-([#27](https://github.com/Qix-/color-convert/pull/27))
-- Removed: `convert()` class
-([#27](https://github.com/Qix-/color-convert/pull/27))
-- Changed: all functions to lookup dictionary
-([#27](https://github.com/Qix-/color-convert/pull/27))
-- Changed: `ansi` to `ansi256`
-([#27](https://github.com/Qix-/color-convert/pull/27))
-- Fixed: argument grouping for functions requiring only one argument
-([#27](https://github.com/Qix-/color-convert/pull/27))
+All notable changes to this project will be documented in this file.
 
-# 0.6.0 - 2015-07-23
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-- Added: methods to handle
-[ANSI](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors) 16/256 colors:
-  - rgb2ansi16
-  - rgb2ansi
-  - hsl2ansi16
-  - hsl2ansi
-  - hsv2ansi16
-  - hsv2ansi
-  - hwb2ansi16
-  - hwb2ansi
-  - cmyk2ansi16
-  - cmyk2ansi
-  - keyword2ansi16
-  - keyword2ansi
-  - ansi162rgb
-  - ansi162hsl
-  - ansi162hsv
-  - ansi162hwb
-  - ansi162cmyk
-  - ansi162keyword
-  - ansi2rgb
-  - ansi2hsl
-  - ansi2hsv
-  - ansi2hwb
-  - ansi2cmyk
-  - ansi2keyword
-([#18](https://github.com/harthur/color-convert/pull/18))
+## [v1.0.1](https://github.com/es-shims/dunder-proto/compare/v1.0.0...v1.0.1) - 2024-12-16
 
-# 0.5.3 - 2015-06-02
+### Commits
 
-- Fixed: hsl2hsv does not return `NaN` anymore when using `[0,0,0]`
-([#15](https://github.com/harthur/color-convert/issues/15))
+- [Fix] do not crash when `--disable-proto=throw` [`6c367d9`](https://github.com/es-shims/dunder-proto/commit/6c367d919bc1604778689a297bbdbfea65752847)
+- [Tests] ensure noproto tests only use the current version of dunder-proto [`b02365b`](https://github.com/es-shims/dunder-proto/commit/b02365b9cf889c4a2cac7be0c3cfc90a789af36c)
+- [Dev Deps] update `@arethetypeswrong/cli`, `@types/tape` [`e3c5c3b`](https://github.com/es-shims/dunder-proto/commit/e3c5c3bd81cf8cef7dff2eca19e558f0e307f666)
+- [Deps] update `call-bind-apply-helpers` [`19f1da0`](https://github.com/es-shims/dunder-proto/commit/19f1da028b8dd0d05c85bfd8f7eed2819b686450)
 
----
+## v1.0.0 - 2024-12-06
 
-Check out commit logs for older releases
+### Commits
+
+- Initial implementation, tests, readme, types [`a5b74b0`](https://github.com/es-shims/dunder-proto/commit/a5b74b0082f5270cb0905cd9a2e533cee7498373)
+- Initial commit [`73fb5a3`](https://github.com/es-shims/dunder-proto/commit/73fb5a353b51ac2ab00c9fdeb0114daffd4c07a8)
+- npm init [`80152dc`](https://github.com/es-shims/dunder-proto/commit/80152dc98155da4eb046d9f67a87ed96e8280a1d)
+- Only apps should have lockfiles [`03e6660`](https://github.com/es-shims/dunder-proto/commit/03e6660a1d70dc401f3e217a031475ec537243dd)

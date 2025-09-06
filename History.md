@@ -1,97 +1,103 @@
-3.1.2 / 2022-01-27
+2.0.0 / 2018-10-26
 ==================
 
-  * Fix return value for un-parsable strings
+  * Drop support for Node.js 0.6
+  * Replace internal `eval` usage with `Function` constructor
+  * Use instance methods on `process` to check for listeners
 
-3.1.1 / 2021-11-15
+1.1.2 / 2018-01-11
 ==================
 
-  * Fix "thousandsSeparator" incorrecting formatting fractional part
+  * perf: remove argument reassignment
+  * Support Node.js 0.6 to 9.x
 
-3.1.0 / 2019-01-22
+1.1.1 / 2017-07-27
 ==================
 
-  * Add petabyte (`pb`) support
+  * Remove unnecessary `Buffer` loading
+  * Support Node.js 0.6 to 8.x
 
-3.0.0 / 2017-08-31
+1.1.0 / 2015-09-14
 ==================
 
-  * Change "kB" to "KB" in format output
-  * Remove support for Node.js 0.6
-  * Remove support for ComponentJS
+  * Enable strict mode in more places
+  * Support io.js 3.x
+  * Support io.js 2.x
+  * Support web browser loading
+    - Requires bundler like Browserify or webpack
 
-2.5.0 / 2017-03-24
+1.0.1 / 2015-04-07
 ==================
 
-  * Add option "unit"
+  * Fix `TypeError`s when under `'use strict'` code
+  * Fix useless type name on auto-generated messages
+  * Support io.js 1.x
+  * Support Node.js 0.12
 
-2.4.0 / 2016-06-01
+1.0.0 / 2014-09-17
 ==================
 
-  * Add option "unitSeparator"
+  * No changes
 
-2.3.0 / 2016-02-15
+0.4.5 / 2014-09-09
 ==================
 
-  * Drop partial bytes on all parsed units
-  * Fix non-finite numbers to `.format` to return `null`
-  * Fix parsing byte string that looks like hex
-  * perf: hoist regular expressions
+  * Improve call speed to functions using the function wrapper
+  * Support Node.js 0.6
 
-2.2.0 / 2015-11-13
+0.4.4 / 2014-07-27
 ==================
 
-  * add option "decimalPlaces"
-  * add option "fixedDecimals"
+  * Work-around v8 generating empty stack traces
 
-2.1.0 / 2015-05-21
+0.4.3 / 2014-07-26
 ==================
 
-  * add `.format` export
-  * add `.parse` export
+  * Fix exception when global `Error.stackTraceLimit` is too low
 
-2.0.2 / 2015-05-20
+0.4.2 / 2014-07-19
 ==================
 
-  * remove map recreation
-  * remove unnecessary object construction
+  * Correct call site for wrapped functions and properties
 
-2.0.1 / 2015-05-07
+0.4.1 / 2014-07-19
 ==================
 
-  * fix browserify require
-  * remove node.extend dependency
+  * Improve automatic message generation for function properties
 
-2.0.0 / 2015-04-12
+0.4.0 / 2014-07-19
 ==================
 
-  * add option "case"
-  * add option "thousandsSeparator"
-  * return "null" on invalid parse input
-  * support proper round-trip: bytes(bytes(num)) === num
-  * units no longer case sensitive when parsing
+  * Add `TRACE_DEPRECATION` environment variable
+  * Remove non-standard grey color from color output
+  * Support `--no-deprecation` argument
+  * Support `--trace-deprecation` argument
+  * Support `deprecate.property(fn, prop, message)`
 
-1.0.0 / 2014-05-05
+0.3.0 / 2014-06-16
 ==================
 
- * add negative support. fixes #6
+  * Add `NO_DEPRECATION` environment variable
 
-0.3.0 / 2014-03-19
+0.2.0 / 2014-06-15
 ==================
 
- * added terabyte support
+  * Add `deprecate.property(obj, prop, message)`
+  * Remove `supports-color` dependency for node.js 0.8
 
-0.2.1 / 2013-04-01
+0.1.0 / 2014-06-15
 ==================
 
-  * add .component
+  * Add `deprecate.function(fn, message)`
+  * Add `process.on('deprecation', fn)` emitter
+  * Automatically generate message when omitted from `deprecate()`
 
-0.2.0 / 2012-10-28
+0.0.1 / 2014-06-15
 ==================
 
-  * bytes(200).should.eql('200b')
+  * Fix warning for dynamic calls at singe call site
 
-0.1.0 / 2012-07-04
+0.0.0 / 2014-06-15
 ==================
 
-  * add bytes to string conversion [yields]
+  * Initial implementation

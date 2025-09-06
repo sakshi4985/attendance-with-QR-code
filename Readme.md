@@ -1,152 +1,280 @@
-# Bytes utility
+# depd
 
-[![NPM Version][npm-image]][npm-url]
-[![NPM Downloads][downloads-image]][downloads-url]
-[![Build Status][ci-image]][ci-url]
-[![Test Coverage][coveralls-image]][coveralls-url]
+[![NPM Version][npm-version-image]][npm-url]
+[![NPM Downloads][npm-downloads-image]][npm-url]
+[![Node.js Version][node-image]][node-url]
+[![Linux Build][travis-image]][travis-url]
+[![Windows Build][appveyor-image]][appveyor-url]
+[![Coverage Status][coveralls-image]][coveralls-url]
 
-Utility to parse a string bytes (ex: `1TB`) to bytes (`1099511627776`) and vice-versa.
+Deprecate all the things
 
-## Installation
+> With great modules comes great responsibility; mark things deprecated!
 
-This is a [Node.js](https://nodejs.org/en/) module available through the
-[npm registry](https://www.npmjs.com/). Installation is done using the
-[`npm install` command](https://docs.npmjs.com/getting-started/installing-npm-packages-locally):
+## Install
 
-```bash
-$ npm install bytes
+This module is installed directly using `npm`:
+
+```sh
+$ npm install depd
 ```
 
-## Usage
+This module can also be bundled with systems like
+[Browserify](http://browserify.org/) or [webpack](https://webpack.github.io/),
+though by default this module will alter it's API to no longer display or
+track deprecations.
+
+## API
+
+<!-- eslint-disable no-unused-vars -->
 
 ```js
-var bytes = require('bytes');
+var deprecate = require('depd')('my-module')
 ```
 
-#### bytes(number｜string value, [options]): number｜string｜null
+This library allows you to display deprecation messages to your users.
+This library goes above and beyond with deprecation warnings by
+introspection of the call stack (but only the bits that it is interested
+in).
 
-Default export function. Delegates to either `bytes.format` or `bytes.parse` based on the type of `value`.
+Instead of just warning on the first invocation of a deprecated
+function and never again, this module will warn on the first invocation
+of a deprecated function per unique call site, making it ideal to alert
+users of all deprecated uses across the code base, rather than just
+whatever happens to execute first.
 
-**Arguments**
+The deprecation warnings from this module also include the file and line
+information for the call into the module that the deprecated function was
+in.
 
-| Name    | Type     | Description        |
-|---------|----------|--------------------|
-| value   | `number`｜`string` | Number value to format or string value to parse |
-| options | `Object` | Conversion options for `format` |
+**NOTE** this library has a similar interface to the `debug` module, and
+this module uses the calling file to get the boundary for the call stacks,
+so you should always create a new `deprecate` object in each file and not
+within some central file.
 
-**Returns**
+### depd(namespace)
 
-| Name    | Type             | Description                                     |
-|---------|------------------|-------------------------------------------------|
-| results | `string`｜`number`｜`null` | Return null upon error. Numeric value in bytes, or string value otherwise. |
+Create a new deprecate function that uses the given namespace name in the
+messages and will display the call site prior to the stack entering the
+file this function was called from. It is highly suggested you use the
+name of your module as the namespace.
 
-**Example**
+### deprecate(message)
 
-```js
-bytes(1024);
-// output: '1KB'
+Call this function from deprecated code to display a deprecation message.
+This message will appear once per unique caller site. Caller site is the
+first call site in the stack in a different file from the caller of this
+function.
 
-bytes('1KB');
-// output: 1024
+If the message is omitted, a message is generated for you based on the site
+of the `deprecate()` call and will display the name of the function called,
+similar to the name displayed in a stack trace.
+
+### deprecate.function(fn, message)
+
+Call this function to wrap a given function in a deprecation message on any
+call to the function. An optional message can be supplied to provide a custom
+message.
+
+### deprecate.property(obj, prop, message)
+
+Call this function to wrap a given property on object in a deprecation message
+on any accessing or setting of the property. An optional message can be supplied
+to provide a custom message.
+
+The method must be called on the object where the property belongs (not
+inherited from the prototype).
+
+If the property is a data descriptor, it will be converted to an accessor
+descriptor in order to display the deprecation message.
+
+### process.on('deprecation', fn)
+
+This module will allow easy capturing of deprecation errors by emitting the
+errors as the type "deprecation" on the global `process`. If there are no
+listeners for this type, the errors are written to STDERR as normal, but if
+there are any listeners, nothing will be written to STDERR and instead only
+emitted. From there, you can write the errors in a different format or to a
+logging source.
+
+The error represents the deprecation and is emitted only once with the same
+rules as writing to STDERR. The error has the following properties:
+
+  - `message` - This is the message given by the library
+  - `name` - This is always `'DeprecationError'`
+  - `namespace` - This is the namespace the deprecation came from
+  - `stack` - This is the stack of the call to the deprecated thing
+
+Example `error.stack` output:
+
+```
+DeprecationError: my-cool-module deprecated oldfunction
+    at Object.<anonymous> ([eval]-wrapper:6:22)
+    at Module._compile (module.js:456:26)
+    at evalScript (node.js:532:25)
+    at startup (node.js:80:7)
+    at node.js:902:3
 ```
 
-#### bytes.format(number value, [options]): string｜null
+### process.env.NO_DEPRECATION
 
-Format the given value in bytes into a string. If the value is negative, it is kept as such. If it is a float, it is
- rounded.
+As a user of modules that are deprecated, the environment variable `NO_DEPRECATION`
+is provided as a quick solution to silencing deprecation warnings from being
+output. The format of this is similar to that of `DEBUG`:
 
-**Arguments**
-
-| Name    | Type     | Description        |
-|---------|----------|--------------------|
-| value   | `number` | Value in bytes     |
-| options | `Object` | Conversion options |
-
-**Options**
-
-| Property          | Type   | Description                                                                             |
-|-------------------|--------|-----------------------------------------------------------------------------------------|
-| decimalPlaces | `number`｜`null` | Maximum number of decimal places to include in output. Default value to `2`. |
-| fixedDecimals | `boolean`｜`null` | Whether to always display the maximum number of decimal places. Default value to `false` |
-| thousandsSeparator | `string`｜`null` | Example of values: `' '`, `','` and `'.'`... Default value to `''`. |
-| unit | `string`｜`null` | The unit in which the result will be returned (B/KB/MB/GB/TB). Default value to `''` (which means auto detect). |
-| unitSeparator | `string`｜`null` | Separator to use between number and unit. Default value to `''`. |
-
-**Returns**
-
-| Name    | Type             | Description                                     |
-|---------|------------------|-------------------------------------------------|
-| results | `string`｜`null` | Return null upon error. String value otherwise. |
-
-**Example**
-
-```js
-bytes.format(1024);
-// output: '1KB'
-
-bytes.format(1000);
-// output: '1000B'
-
-bytes.format(1000, {thousandsSeparator: ' '});
-// output: '1 000B'
-
-bytes.format(1024 * 1.7, {decimalPlaces: 0});
-// output: '2KB'
-
-bytes.format(1024, {unitSeparator: ' '});
-// output: '1 KB'
+```sh
+$ NO_DEPRECATION=my-module,othermod node app.js
 ```
 
-#### bytes.parse(string｜number value): number｜null
+This will suppress deprecations from being output for "my-module" and "othermod".
+The value is a list of comma-separated namespaces. To suppress every warning
+across all namespaces, use the value `*` for a namespace.
 
-Parse the string value into an integer in bytes. If no unit is given, or `value`
-is a number, it is assumed the value is in bytes.
+Providing the argument `--no-deprecation` to the `node` executable will suppress
+all deprecations (only available in Node.js 0.8 or higher).
 
-Supported units and abbreviations are as follows and are case-insensitive:
+**NOTE** This will not suppress the deperecations given to any "deprecation"
+event listeners, just the output to STDERR.
 
-  * `b` for bytes
-  * `kb` for kilobytes
-  * `mb` for megabytes
-  * `gb` for gigabytes
-  * `tb` for terabytes
-  * `pb` for petabytes
+### process.env.TRACE_DEPRECATION
 
-The units are in powers of two, not ten. This means 1kb = 1024b according to this parser.
+As a user of modules that are deprecated, the environment variable `TRACE_DEPRECATION`
+is provided as a solution to getting more detailed location information in deprecation
+warnings by including the entire stack trace. The format of this is the same as
+`NO_DEPRECATION`:
 
-**Arguments**
+```sh
+$ TRACE_DEPRECATION=my-module,othermod node app.js
+```
 
-| Name          | Type   | Description        |
-|---------------|--------|--------------------|
-| value   | `string`｜`number` | String to parse, or number in bytes.   |
+This will include stack traces for deprecations being output for "my-module" and
+"othermod". The value is a list of comma-separated namespaces. To trace every
+warning across all namespaces, use the value `*` for a namespace.
 
-**Returns**
+Providing the argument `--trace-deprecation` to the `node` executable will trace
+all deprecations (only available in Node.js 0.8 or higher).
 
-| Name    | Type        | Description             |
-|---------|-------------|-------------------------|
-| results | `number`｜`null` | Return null upon error. Value in bytes otherwise. |
+**NOTE** This will not trace the deperecations silenced by `NO_DEPRECATION`.
 
-**Example**
+## Display
+
+![message](files/message.png)
+
+When a user calls a function in your library that you mark deprecated, they
+will see the following written to STDERR (in the given colors, similar colors
+and layout to the `debug` module):
+
+```
+bright cyan    bright yellow
+|              |          reset       cyan
+|              |          |           |
+▼              ▼          ▼           ▼
+my-cool-module deprecated oldfunction [eval]-wrapper:6:22
+▲              ▲          ▲           ▲
+|              |          |           |
+namespace      |          |           location of mycoolmod.oldfunction() call
+               |          deprecation message
+               the word "deprecated"
+```
+
+If the user redirects their STDERR to a file or somewhere that does not support
+colors, they see (similar layout to the `debug` module):
+
+```
+Sun, 15 Jun 2014 05:21:37 GMT my-cool-module deprecated oldfunction at [eval]-wrapper:6:22
+▲                             ▲              ▲          ▲              ▲
+|                             |              |          |              |
+timestamp of message          namespace      |          |             location of mycoolmod.oldfunction() call
+                                             |          deprecation message
+                                             the word "deprecated"
+```
+
+## Examples
+
+### Deprecating all calls to a function
+
+This will display a deprecated message about "oldfunction" being deprecated
+from "my-module" on STDERR.
 
 ```js
-bytes.parse('1KB');
-// output: 1024
+var deprecate = require('depd')('my-cool-module')
 
-bytes.parse('1024');
-// output: 1024
+// message automatically derived from function name
+// Object.oldfunction
+exports.oldfunction = deprecate.function(function oldfunction () {
+  // all calls to function are deprecated
+})
 
-bytes.parse(1024);
-// output: 1024
+// specific message
+exports.oldfunction = deprecate.function(function () {
+  // all calls to function are deprecated
+}, 'oldfunction')
+```
+
+### Conditionally deprecating a function call
+
+This will display a deprecated message about "weirdfunction" being deprecated
+from "my-module" on STDERR when called with less than 2 arguments.
+
+```js
+var deprecate = require('depd')('my-cool-module')
+
+exports.weirdfunction = function () {
+  if (arguments.length < 2) {
+    // calls with 0 or 1 args are deprecated
+    deprecate('weirdfunction args < 2')
+  }
+}
+```
+
+When calling `deprecate` as a function, the warning is counted per call site
+within your own module, so you can display different deprecations depending
+on different situations and the users will still get all the warnings:
+
+```js
+var deprecate = require('depd')('my-cool-module')
+
+exports.weirdfunction = function () {
+  if (arguments.length < 2) {
+    // calls with 0 or 1 args are deprecated
+    deprecate('weirdfunction args < 2')
+  } else if (typeof arguments[0] !== 'string') {
+    // calls with non-string first argument are deprecated
+    deprecate('weirdfunction non-string first arg')
+  }
+}
+```
+
+### Deprecating property access
+
+This will display a deprecated message about "oldprop" being deprecated
+from "my-module" on STDERR when accessed. A deprecation will be displayed
+when setting the value and when getting the value.
+
+```js
+var deprecate = require('depd')('my-cool-module')
+
+exports.oldprop = 'something'
+
+// message automatically derives from property name
+deprecate.property(exports, 'oldprop')
+
+// explicit message
+deprecate.property(exports, 'oldprop', 'oldprop >= 0.10')
 ```
 
 ## License
 
 [MIT](LICENSE)
 
-[ci-image]: https://badgen.net/github/checks/visionmedia/bytes.js/master?label=ci
-[ci-url]: https://github.com/visionmedia/bytes.js/actions?query=workflow%3Aci
-[coveralls-image]: https://badgen.net/coveralls/c/github/visionmedia/bytes.js/master
-[coveralls-url]: https://coveralls.io/r/visionmedia/bytes.js?branch=master
-[downloads-image]: https://badgen.net/npm/dm/bytes
-[downloads-url]: https://npmjs.org/package/bytes
-[npm-image]: https://badgen.net/npm/v/bytes
-[npm-url]: https://npmjs.org/package/bytes
+[appveyor-image]: https://badgen.net/appveyor/ci/dougwilson/nodejs-depd/master?label=windows
+[appveyor-url]: https://ci.appveyor.com/project/dougwilson/nodejs-depd
+[coveralls-image]: https://badgen.net/coveralls/c/github/dougwilson/nodejs-depd/master
+[coveralls-url]: https://coveralls.io/r/dougwilson/nodejs-depd?branch=master
+[node-image]: https://badgen.net/npm/node/depd
+[node-url]: https://nodejs.org/en/download/
+[npm-downloads-image]: https://badgen.net/npm/dm/depd
+[npm-url]: https://npmjs.org/package/depd
+[npm-version-image]: https://badgen.net/npm/v/depd
+[travis-image]: https://badgen.net/travis/dougwilson/nodejs-depd/master?label=linux
+[travis-url]: https://travis-ci.org/dougwilson/nodejs-depd
