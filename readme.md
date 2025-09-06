@@ -1,93 +1,151 @@
-# p-locate [![Build Status](https://travis-ci.com/sindresorhus/p-locate.svg?branch=master)](https://travis-ci.com/github/sindresorhus/p-locate)
+<h1 align="center"> <code>express-rate-limit</code> </h1>
 
-> Get the first fulfilled promise that satisfies the provided testing function
+<div align="center">
 
-Think of it like an async version of [`Array#find`](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/find).
+[![tests](https://img.shields.io/github/actions/workflow/status/express-rate-limit/express-rate-limit/ci.yaml)](https://github.com/express-rate-limit/express-rate-limit/actions/workflows/ci.yaml)
+[![npm version](https://img.shields.io/npm/v/express-rate-limit.svg)](https://npmjs.org/package/express-rate-limit 'View this project on NPM')
+[![npm downloads](https://img.shields.io/npm/dm/express-rate-limit)](https://www.npmjs.com/package/express-rate-limit)
+[![license](https://img.shields.io/npm/l/express-rate-limit)](license.md)
 
-## Install
+</div>
 
-```
-$ npm install p-locate
-```
+Basic rate-limiting middleware for [Express](http://expressjs.com/). Use to
+limit repeated requests to public APIs and/or endpoints such as password reset.
+Plays nice with
+[express-slow-down](https://www.npmjs.com/package/express-slow-down) and
+[ratelimit-header-parser](https://www.npmjs.com/package/ratelimit-header-parser).
 
 ## Usage
 
-Here we find the first file that exists on disk, in array order.
+The [full documentation](https://express-rate-limit.mintlify.app/overview) is
+available on-line.
 
-```js
-const pathExists = require('path-exists');
-const pLocate = require('p-locate');
+```ts
+import { rateLimit } from 'express-rate-limit'
 
-const files = [
-	'unicorn.png',
-	'rainbow.png', // Only this one actually exists on disk
-	'pony.png'
-];
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+	standardHeaders: 'draft-8', // draft-6: `RateLimit-*` headers; draft-7 & draft-8: combined `RateLimit` header
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+	ipv6Subnet: 56, // Set to 60 or 64 to be less aggressive, or 52 or 48 to be more aggressive
+	// store: ... , // Redis, Memcached, etc. See below.
+})
 
-(async () => {
-	const foundPath = await pLocate(files, file => pathExists(file));
-
-	console.log(foundPath);
-	//=> 'rainbow'
-})();
+// Apply the rate limiting middleware to all requests.
+app.use(limiter)
 ```
 
-*The above is just an example. Use [`locate-path`](https://github.com/sindresorhus/locate-path) if you need this.*
+### Data Stores
 
-## API
+The rate limiter comes with a built-in memory store, and supports a variety of
+[external data stores](https://express-rate-limit.mintlify.app/reference/stores).
 
-### pLocate(input, tester, options?)
+### Configuration
 
-Returns a `Promise` that is fulfilled when `tester` resolves to `true` or the iterable is done, or rejects if any of the promises reject. The fulfilled value is the current iterable value or `undefined` if `tester` never resolved to `true`.
+All function options may be async. Click the name for additional info and
+default values.
 
-#### input
+| Option                     | Type                                      | Remarks                                                                                         |
+| -------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| [`windowMs`]               | `number`                                  | How long to remember requests for, in milliseconds.                                             |
+| [`limit`]                  | `number` \| `function`                    | How many requests to allow.                                                                     |
+| [`message`]                | `string` \| `json` \| `function`          | Response to return after limit is reached.                                                      |
+| [`statusCode`]             | `number`                                  | HTTP status code after limit is reached (default is 429).                                       |
+| [`handler`]                | `function`                                | Function to run after limit is reached (overrides `message` and `statusCode` settings, if set). |
+| [`legacyHeaders`]          | `boolean`                                 | Enable the `X-Rate-Limit` header.                                                               |
+| [`standardHeaders`]        | `'draft-6'` \| `'draft-7'` \| `'draft-8'` | Enable the `Ratelimit` header.                                                                  |
+| [`identifier`]             | `string` \| `function`                    | Name associated with the quota policy enforced by this rate limiter.                            |
+| [`store`]                  | `Store`                                   | Use a custom store to share hit counts across multiple nodes.                                   |
+| [`passOnStoreError`]       | `boolean`                                 | Allow (`true`) or block (`false`, default) traffic if the store becomes unavailable.            |
+| [`keyGenerator`]           | `function`                                | Identify users (defaults to IP address).                                                        |
+| [`ipv6Subnet`]             | `number` (32-64) \| `function` \| `false` | How many bits of IPv6 addresses to use in default `keyGenerator`                                |
+| [`requestPropertyName`]    | `string`                                  | Add rate limit info to the `req` object.                                                        |
+| [`skip`]                   | `function`                                | Return `true` to bypass the limiter for the given request.                                      |
+| [`skipSuccessfulRequests`] | `boolean`                                 | Uncount 1xx/2xx/3xx responses.                                                                  |
+| [`skipFailedRequests`]     | `boolean`                                 | Uncount 4xx/5xx responses.                                                                      |
+| [`requestWasSuccessful`]   | `function`                                | Used by `skipSuccessfulRequests` and `skipFailedRequests`.                                      |
+| [`validate`]               | `boolean` \| `object`                     | Enable or disable built-in validation checks.                                                   |
 
-Type: `Iterable<Promise | unknown>`
+## Thank You
 
-An iterable of promises/values to test.
+Sponsored by [Zuplo](https://zuplo.link/express-rate-limit) a fully-managed API
+Gateway for developers. Add
+[dynamic rate-limiting](https://zuplo.link/dynamic-rate-limiting),
+authentication and more to any API in minutes. Learn more at
+[zuplo.com](https://zuplo.link/express-rate-limit)
 
-#### tester(element)
-
-Type: `Function`
-
-This function will receive resolved values from `input` and is expected to return a `Promise<boolean>` or `boolean`.
-
-#### options
-
-Type: `object`
-
-##### concurrency
-
-Type: `number`\
-Default: `Infinity`\
-Minimum: `1`
-
-Number of concurrently pending promises returned by `tester`.
-
-##### preserveOrder
-
-Type: `boolean`\
-Default: `true`
-
-Preserve `input` order when searching.
-
-Disable this to improve performance if you don't care about the order.
-
-## Related
-
-- [p-map](https://github.com/sindresorhus/p-map) - Map over promises concurrently
-- [p-filter](https://github.com/sindresorhus/p-filter) - Filter promises concurrently
-- [p-any](https://github.com/sindresorhus/p-any) - Wait for any promise to be fulfilled
-- [More…](https://github.com/sindresorhus/promise-fun)
+<p align="center">
+<a href="https://zuplo.link/express-rate-limit">
+<picture width="322">
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/express-rate-limit/express-rate-limit/assets/114976/cd2f6fa7-eae1-4fbb-be7d-b17df4c6f383">
+  <img alt="zuplo-logo" src="https://github.com/express-rate-limit/express-rate-limit/assets/114976/66fd75fa-b39e-4a8c-8d7a-52369bf244dc" width="322">
+</picture>
+</a>
+</p>
 
 ---
 
-<div align="center">
-	<b>
-		<a href="https://tidelift.com/subscription/pkg/npm-p-locate?utm_source=npm-p-locate&utm_medium=referral&utm_campaign=readme">Get professional support for this package with a Tidelift subscription</a>
-	</b>
-	<br>
-	<sub>
-		Tidelift helps make open source sustainable for maintainers while giving companies<br>assurances about security, maintenance, and licensing for their dependencies.
-	</sub>
-</div>
+Thanks to Mintlify for hosting the documentation at
+[express-rate-limit.mintlify.app](https://express-rate-limit.mintlify.app)
+
+<p align="center">
+	<a href="https://mintlify.com/?utm_campaign=devmark&utm_medium=readme&utm_source=express-rate-limit">
+		<img height="75" src="https://devmark-public-assets.s3.us-west-2.amazonaws.com/sponsorships/mintlify.svg" alt="Create your docs today">
+	</a>
+</p>
+
+---
+
+Finally, thank you to everyone who's contributed to this project in any way! 🫶
+
+## Issues and Contributing
+
+If you encounter a bug or want to see something added/changed, please go ahead
+and
+[open an issue](https://github.com/express-rate-limit/express-rate-limit/issues/new)!
+If you need help with something, feel free to
+[start a discussion](https://github.com/express-rate-limit/express-rate-limit/discussions/new)!
+
+If you wish to contribute to the library, thanks! First, please read
+[the contributing guide](https://express-rate-limit.mintlify.app/docs/guides/contributing.mdx).
+Then you can pick up any issue and fix/implement it!
+
+## License
+
+MIT © [Nathan Friedly](http://nfriedly.com/),
+[Vedant K](https://github.com/gamemaker1)
+
+[`windowMs`]:
+	https://express-rate-limit.mintlify.app/reference/configuration#windowms
+[`limit`]: https://express-rate-limit.mintlify.app/reference/configuration#limit
+[`message`]:
+	https://express-rate-limit.mintlify.app/reference/configuration#message
+[`statusCode`]:
+	https://express-rate-limit.mintlify.app/reference/configuration#statuscode
+[`handler`]:
+	https://express-rate-limit.mintlify.app/reference/configuration#handler
+[`legacyHeaders`]:
+	https://express-rate-limit.mintlify.app/reference/configuration#legacyheaders
+[`standardHeaders`]:
+	https://express-rate-limit.mintlify.app/reference/configuration#standardheaders
+[`identifier`]:
+	https://express-rate-limit.mintlify.app/reference/configuration#identifier
+[`store`]: https://express-rate-limit.mintlify.app/reference/configuration#store
+[`passOnStoreError`]:
+	https://express-rate-limit.mintlify.app/reference/configuration#passonstoreerror
+[`keyGenerator`]:
+	https://express-rate-limit.mintlify.app/reference/configuration#keygenerator
+[`ipv6Subnet`]:
+	https://express-rate-limit.mintlify.app/reference/configuration#ipv6subnet
+[`requestPropertyName`]:
+	https://express-rate-limit.mintlify.app/reference/configuration#requestpropertyname
+[`skip`]: https://express-rate-limit.mintlify.app/reference/configuration#skip
+[`skipSuccessfulRequests`]:
+	https://express-rate-limit.mintlify.app/reference/configuration#skipsuccessfulrequests
+[`skipFailedRequests`]:
+	https://express-rate-limit.mintlify.app/reference/configuration#skipfailedrequests
+[`requestWasSuccessful`]:
+	https://express-rate-limit.mintlify.app/reference/configuration#requestwassuccessful
+[`validate`]:
+	https://express-rate-limit.mintlify.app/reference/configuration#validate

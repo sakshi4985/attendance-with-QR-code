@@ -1,620 +1,881 @@
-'use strict';
+"use strict";
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-var levn = require('levn');
+// source/index.ts
+var index_exports = {};
+__export(index_exports, {
+  MemoryStore: () => MemoryStore,
+  default: () => rate_limit_default,
+  ipKeyGenerator: () => ipKeyGenerator,
+  rateLimit: () => rate_limit_default
+});
+module.exports = __toCommonJS(index_exports);
 
-/**
- * @fileoverview Config Comment Parser
- * @author Nicholas C. Zakas
- */
-
-
-//-----------------------------------------------------------------------------
-// Type Definitions
-//-----------------------------------------------------------------------------
-
-/** @typedef {import("@eslint/core").RuleConfig} RuleConfig */
-/** @typedef {import("@eslint/core").RulesConfig} RulesConfig */
-/** @typedef {import("./types.ts").StringConfig} StringConfig */
-/** @typedef {import("./types.ts").BooleanConfig} BooleanConfig */
-
-//-----------------------------------------------------------------------------
-// Helpers
-//-----------------------------------------------------------------------------
-
-const directivesPattern = /^([a-z]+(?:-[a-z]+)*)(?:\s|$)/u;
-const validSeverities = new Set([0, 1, 2, "off", "warn", "error"]);
-
-/**
- * Determines if the severity in the rule configuration is valid.
- * @param {RuleConfig} ruleConfig A rule's configuration.
- * @returns {boolean} `true` if the severity is valid, otherwise `false`.
- */
-function isSeverityValid(ruleConfig) {
-	const severity = Array.isArray(ruleConfig) ? ruleConfig[0] : ruleConfig;
-	return validSeverities.has(severity);
+// source/ip-key-generator.ts
+var import_node_net = require("node:net");
+var import_ip_address = require("ip-address");
+function ipKeyGenerator(ip, ipv6Subnet = 56) {
+  if (ipv6Subnet && (0, import_node_net.isIPv6)(ip)) {
+    return `${new import_ip_address.Address6(`${ip}/${ipv6Subnet}`).startAddress().correctForm()}/${ipv6Subnet}`;
+  }
+  return ip;
 }
 
-/**
- * Determines if all severities in the rules configuration are valid.
- * @param {RulesConfig} rulesConfig The rules configuration to check.
- * @returns {boolean} `true` if all severities are valid, otherwise `false`.
- */
-function isEverySeverityValid(rulesConfig) {
-	return Object.values(rulesConfig).every(isSeverityValid);
-}
-
-/**
- * Represents a directive comment.
- */
-class DirectiveComment {
-	/**
-	 * The label of the directive, such as "eslint", "eslint-disable", etc.
-	 * @type {string}
-	 */
-	label = "";
-
-	/**
-	 * The value of the directive (the string after the label).
-	 * @type {string}
-	 */
-	value = "";
-
-	/**
-	 * The justification of the directive (the string after the --).
-	 * @type {string}
-	 */
-	justification = "";
-
-	/**
-	 * Creates a new directive comment.
-	 * @param {string} label The label of the directive.
-	 * @param {string} value The value of the directive.
-	 * @param {string} justification The justification of the directive.
-	 */
-	constructor(label, value, justification) {
-		this.label = label;
-		this.value = value;
-		this.justification = justification;
-	}
-}
-
-//------------------------------------------------------------------------------
-// Public Interface
-//------------------------------------------------------------------------------
-
-/**
- * Object to parse ESLint configuration comments.
- */
-class ConfigCommentParser {
-	/**
-	 * Parses a list of "name:string_value" or/and "name" options divided by comma or
-	 * whitespace. Used for "global" comments.
-	 * @param {string} string The string to parse.
-	 * @returns {StringConfig} Result map object of names and string values, or null values if no value was provided.
-	 */
-	parseStringConfig(string) {
-		const items = /** @type {StringConfig} */ ({});
-
-		// Collapse whitespace around `:` and `,` to make parsing easier
-		const trimmedString = string
-			.trim()
-			.replace(/(?<!\s)\s*([:,])\s*/gu, "$1");
-
-		trimmedString.split(/\s|,+/u).forEach(name => {
-			if (!name) {
-				return;
-			}
-
-			// value defaults to null (if not provided), e.g: "foo" => ["foo", null]
-			const [key, value = null] = name.split(":");
-
-			items[key] = value;
-		});
-
-		return items;
-	}
-
-	/**
-	 * Parses a JSON-like config.
-	 * @param {string} string The string to parse.
-	 * @returns {({ok: true, config: RulesConfig}|{ok: false, error: {message: string}})} Result map object
-	 */
-	parseJSONLikeConfig(string) {
-		// Parses a JSON-like comment by the same way as parsing CLI option.
-		try {
-			const items =
-				/** @type {RulesConfig} */ (levn.parse("Object", string)) || {};
-
-			/*
-			 * When the configuration has any invalid severities, it should be completely
-			 * ignored. This is because the configuration is not valid and should not be
-			 * applied.
-			 *
-			 * For example, the following configuration is invalid:
-			 *
-			 *    "no-alert: 2 no-console: 2"
-			 *
-			 * This results in a configuration of { "no-alert": "2 no-console: 2" }, which is
-			 * not valid. In this case, the configuration should be ignored.
-			 */
-			if (isEverySeverityValid(items)) {
-				return {
-					ok: true,
-					config: items,
-				};
-			}
-		} catch {
-			// levn parsing error: ignore to parse the string by a fallback.
-		}
-
-		/*
-		 * Optionator cannot parse commaless notations.
-		 * But we are supporting that. So this is a fallback for that.
-		 */
-		const normalizedString = string
-			.replace(/(?<![-a-zA-Z0-9/])([-a-zA-Z0-9/]+):/gu, '"$1":')
-			.replace(/(\]|[0-9])\s+(?=")/u, "$1,");
-
-		try {
-			const items = JSON.parse(`{${normalizedString}}`);
-
-			return {
-				ok: true,
-				config: items,
-			};
-		} catch (ex) {
-			const errorMessage = ex instanceof Error ? ex.message : String(ex);
-
-			return {
-				ok: false,
-				error: {
-					message: `Failed to parse JSON from '${normalizedString}': ${errorMessage}`,
-				},
-			};
-		}
-	}
-
-	/**
-	 * Parses a config of values separated by comma.
-	 * @param {string} string The string to parse.
-	 * @returns {BooleanConfig} Result map of values and true values
-	 */
-	parseListConfig(string) {
-		const items = /** @type {BooleanConfig} */ ({});
-
-		string.split(",").forEach(name => {
-			const trimmedName = name
-				.trim()
-				.replace(
-					/^(?<quote>['"]?)(?<ruleId>.*)\k<quote>$/su,
-					"$<ruleId>",
-				);
-
-			if (trimmedName) {
-				items[trimmedName] = true;
-			}
-		});
-
-		return items;
-	}
-
-	/**
-	 * Extract the directive and the justification from a given directive comment and trim them.
-	 * @param {string} value The comment text to extract.
-	 * @returns {{directivePart: string, justificationPart: string}} The extracted directive and justification.
-	 */
-	#extractDirectiveComment(value) {
-		const match = /\s-{2,}\s/u.exec(value);
-
-		if (!match) {
-			return { directivePart: value.trim(), justificationPart: "" };
-		}
-
-		const directive = value.slice(0, match.index).trim();
-		const justification = value.slice(match.index + match[0].length).trim();
-
-		return { directivePart: directive, justificationPart: justification };
-	}
-
-	/**
-	 * Parses a directive comment into directive text and value.
-	 * @param {string} string The string with the directive to be parsed.
-	 * @returns {DirectiveComment|undefined} The parsed directive or `undefined` if the directive is invalid.
-	 */
-	parseDirective(string) {
-		const { directivePart, justificationPart } =
-			this.#extractDirectiveComment(string);
-		const match = directivesPattern.exec(directivePart);
-
-		if (!match) {
-			return undefined;
-		}
-
-		const directiveText = match[1];
-		const directiveValue = directivePart.slice(
-			match.index + directiveText.length,
-		);
-
-		return new DirectiveComment(
-			directiveText,
-			directiveValue.trim(),
-			justificationPart,
-		);
-	}
-}
-
-/**
- * @fileoverview A collection of helper classes for implementing `SourceCode`.
- * @author Nicholas C. Zakas
- */
-
-/* eslint class-methods-use-this: off -- Required to complete interface. */
-
-//-----------------------------------------------------------------------------
-// Type Definitions
-//-----------------------------------------------------------------------------
-
-/** @typedef {import("@eslint/core").VisitTraversalStep} VisitTraversalStep */
-/** @typedef {import("@eslint/core").CallTraversalStep} CallTraversalStep */
-/** @typedef {import("@eslint/core").TraversalStep} TraversalStep */
-/** @typedef {import("@eslint/core").SourceLocation} SourceLocation */
-/** @typedef {import("@eslint/core").SourceLocationWithOffset} SourceLocationWithOffset */
-/** @typedef {import("@eslint/core").SourceRange} SourceRange */
-/** @typedef {import("@eslint/core").Directive} IDirective */
-/** @typedef {import("@eslint/core").DirectiveType} DirectiveType */
-/** @typedef {import("@eslint/core").SourceCodeBaseTypeOptions} SourceCodeBaseTypeOptions */
-/**
- * @typedef {import("@eslint/core").TextSourceCode<Options>} TextSourceCode<Options>
- * @template {SourceCodeBaseTypeOptions} [Options=SourceCodeBaseTypeOptions]
- */
-
-//-----------------------------------------------------------------------------
-// Helpers
-//-----------------------------------------------------------------------------
-
-/**
- * Determines if a node has ESTree-style loc information.
- * @param {object} node The node to check.
- * @returns {node is {loc:SourceLocation}} `true` if the node has ESTree-style loc information, `false` if not.
- */
-function hasESTreeStyleLoc(node) {
-	return "loc" in node;
-}
-
-/**
- * Determines if a node has position-style loc information.
- * @param {object} node The node to check.
- * @returns {node is {position:SourceLocation}} `true` if the node has position-style range information, `false` if not.
- */
-function hasPosStyleLoc(node) {
-	return "position" in node;
-}
-
-/**
- * Determines if a node has ESTree-style range information.
- * @param {object} node The node to check.
- * @returns {node is {range:SourceRange}} `true` if the node has ESTree-style range information, `false` if not.
- */
-function hasESTreeStyleRange(node) {
-	return "range" in node;
-}
-
-/**
- * Determines if a node has position-style range information.
- * @param {object} node The node to check.
- * @returns {node is {position:SourceLocationWithOffset}} `true` if the node has position-style range information, `false` if not.
- */
-function hasPosStyleRange(node) {
-	return "position" in node;
-}
-
-//-----------------------------------------------------------------------------
-// Exports
-//-----------------------------------------------------------------------------
-
-/**
- * A class to represent a step in the traversal process where a node is visited.
- * @implements {VisitTraversalStep}
- */
-class VisitNodeStep {
-	/**
-	 * The type of the step.
-	 * @type {"visit"}
-	 * @readonly
-	 */
-	type = "visit";
-
-	/**
-	 * The kind of the step. Represents the same data as the `type` property
-	 * but it's a number for performance.
-	 * @type {1}
-	 * @readonly
-	 */
-	kind = 1;
-
-	/**
-	 * The target of the step.
-	 * @type {object}
-	 */
-	target;
-
-	/**
-	 * The phase of the step.
-	 * @type {1|2}
-	 */
-	phase;
-
-	/**
-	 * The arguments of the step.
-	 * @type {Array<any>}
-	 */
-	args;
-
-	/**
-	 * Creates a new instance.
-	 * @param {Object} options The options for the step.
-	 * @param {object} options.target The target of the step.
-	 * @param {1|2} options.phase The phase of the step.
-	 * @param {Array<any>} options.args The arguments of the step.
-	 */
-	constructor({ target, phase, args }) {
-		this.target = target;
-		this.phase = phase;
-		this.args = args;
-	}
-}
-
-/**
- * A class to represent a step in the traversal process where a
- * method is called.
- * @implements {CallTraversalStep}
- */
-class CallMethodStep {
-	/**
-	 * The type of the step.
-	 * @type {"call"}
-	 * @readonly
-	 */
-	type = "call";
-
-	/**
-	 * The kind of the step. Represents the same data as the `type` property
-	 * but it's a number for performance.
-	 * @type {2}
-	 * @readonly
-	 */
-	kind = 2;
-
-	/**
-	 * The name of the method to call.
-	 * @type {string}
-	 */
-	target;
-
-	/**
-	 * The arguments to pass to the method.
-	 * @type {Array<any>}
-	 */
-	args;
-
-	/**
-	 * Creates a new instance.
-	 * @param {Object} options The options for the step.
-	 * @param {string} options.target The target of the step.
-	 * @param {Array<any>} options.args The arguments of the step.
-	 */
-	constructor({ target, args }) {
-		this.target = target;
-		this.args = args;
-	}
-}
-
-/**
- * A class to represent a directive comment.
- * @implements {IDirective}
- */
-class Directive {
-	/**
-	 * The type of directive.
-	 * @type {DirectiveType}
-	 * @readonly
-	 */
-	type;
-
-	/**
-	 * The node representing the directive.
-	 * @type {unknown}
-	 * @readonly
-	 */
-	node;
-
-	/**
-	 * Everything after the "eslint-disable" portion of the directive,
-	 * but before the "--" that indicates the justification.
-	 * @type {string}
-	 * @readonly
-	 */
-	value;
-
-	/**
-	 * The justification for the directive.
-	 * @type {string}
-	 * @readonly
-	 */
-	justification;
-
-	/**
-	 * Creates a new instance.
-	 * @param {Object} options The options for the directive.
-	 * @param {"disable"|"enable"|"disable-next-line"|"disable-line"} options.type The type of directive.
-	 * @param {unknown} options.node The node representing the directive.
-	 * @param {string} options.value The value of the directive.
-	 * @param {string} options.justification The justification for the directive.
-	 */
-	constructor({ type, node, value, justification }) {
-		this.type = type;
-		this.node = node;
-		this.value = value;
-		this.justification = justification;
-	}
-}
-
-/**
- * Source Code Base Object
- * @template {SourceCodeBaseTypeOptions & {SyntaxElementWithLoc: object}} [Options=SourceCodeBaseTypeOptions & {SyntaxElementWithLoc: object}]
- * @implements {TextSourceCode<Options>}
- */
-class TextSourceCodeBase {
-	/**
-	 * The lines of text in the source code.
-	 * @type {Array<string>}
-	 */
-	#lines;
-
-	/**
-	 * The AST of the source code.
-	 * @type {Options['RootNode']}
-	 */
-	ast;
-
-	/**
-	 * The text of the source code.
-	 * @type {string}
-	 */
-	text;
-
-	/**
-	 * Creates a new instance.
-	 * @param {Object} options The options for the instance.
-	 * @param {string} options.text The source code text.
-	 * @param {Options['RootNode']} options.ast The root AST node.
-	 * @param {RegExp} [options.lineEndingPattern] The pattern to match lineEndings in the source code.
-	 */
-	constructor({ text, ast, lineEndingPattern = /\r?\n/u }) {
-		this.ast = ast;
-		this.text = text;
-		this.#lines = text.split(lineEndingPattern);
-	}
-
-	/**
-	 * Returns the loc information for the given node or token.
-	 * @param {Options['SyntaxElementWithLoc']} nodeOrToken The node or token to get the loc information for.
-	 * @returns {SourceLocation} The loc information for the node or token.
-	 * @throws {Error} If the node or token does not have loc information.
-	 */
-	getLoc(nodeOrToken) {
-		if (hasESTreeStyleLoc(nodeOrToken)) {
-			return nodeOrToken.loc;
-		}
-
-		if (hasPosStyleLoc(nodeOrToken)) {
-			return nodeOrToken.position;
-		}
-
-		throw new Error(
-			"Custom getLoc() method must be implemented in the subclass.",
-		);
-	}
-
-	/**
-	 * Returns the range information for the given node or token.
-	 * @param {Options['SyntaxElementWithLoc']} nodeOrToken The node or token to get the range information for.
-	 * @returns {SourceRange} The range information for the node or token.
-	 * @throws {Error} If the node or token does not have range information.
-	 */
-	getRange(nodeOrToken) {
-		if (hasESTreeStyleRange(nodeOrToken)) {
-			return nodeOrToken.range;
-		}
-
-		if (hasPosStyleRange(nodeOrToken)) {
-			return [
-				nodeOrToken.position.start.offset,
-				nodeOrToken.position.end.offset,
-			];
-		}
-
-		throw new Error(
-			"Custom getRange() method must be implemented in the subclass.",
-		);
-	}
-
-	/* eslint-disable no-unused-vars -- Required to complete interface. */
-	/**
-	 * Returns the parent of the given node.
-	 * @param {Options['SyntaxElementWithLoc']} node The node to get the parent of.
-	 * @returns {Options['SyntaxElementWithLoc']|undefined} The parent of the node.
-	 * @throws {Error} If the method is not implemented in the subclass.
-	 */
-	getParent(node) {
-		throw new Error("Not implemented.");
-	}
-	/* eslint-enable no-unused-vars -- Required to complete interface. */
-
-	/**
-	 * Gets all the ancestors of a given node
-	 * @param {Options['SyntaxElementWithLoc']} node The node
-	 * @returns {Array<Options['SyntaxElementWithLoc']>} All the ancestor nodes in the AST, not including the provided node, starting
-	 * from the root node at index 0 and going inwards to the parent node.
-	 * @throws {TypeError} When `node` is missing.
-	 */
-	getAncestors(node) {
-		if (!node) {
-			throw new TypeError("Missing required argument: node.");
-		}
-
-		const ancestorsStartingAtParent = [];
-
-		for (
-			let ancestor = this.getParent(node);
-			ancestor;
-			ancestor = this.getParent(ancestor)
-		) {
-			ancestorsStartingAtParent.push(ancestor);
-		}
-
-		return ancestorsStartingAtParent.reverse();
-	}
-
-	/**
-	 * Gets the source code for the given node.
-	 * @param {Options['SyntaxElementWithLoc']} [node] The AST node to get the text for.
-	 * @param {number} [beforeCount] The number of characters before the node to retrieve.
-	 * @param {number} [afterCount] The number of characters after the node to retrieve.
-	 * @returns {string} The text representing the AST node.
-	 * @public
-	 */
-	getText(node, beforeCount, afterCount) {
-		if (node) {
-			const range = this.getRange(node);
-			return this.text.slice(
-				Math.max(range[0] - (beforeCount || 0), 0),
-				range[1] + (afterCount || 0),
-			);
-		}
-		return this.text;
-	}
-
-	/**
-	 * Gets the entire source text split into an array of lines.
-	 * @returns {Array<string>} The source text as an array of lines.
-	 * @public
-	 */
-	get lines() {
-		return this.#lines;
-	}
-
-	/**
-	 * Traverse the source code and return the steps that were taken.
-	 * @returns {Iterable<TraversalStep>} The steps that were taken while traversing the source code.
-	 */
-	traverse() {
-		throw new Error("Not implemented.");
-	}
-}
-
-exports.CallMethodStep = CallMethodStep;
-exports.ConfigCommentParser = ConfigCommentParser;
-exports.Directive = Directive;
-exports.TextSourceCodeBase = TextSourceCodeBase;
-exports.VisitNodeStep = VisitNodeStep;
+// source/memory-store.ts
+var MemoryStore = class {
+  constructor() {
+    /**
+     * These two maps store usage (requests) and reset time by key (for example, IP
+     * addresses or API keys).
+     *
+     * They are split into two to avoid having to iterate through the entire set to
+     * determine which ones need reset. Instead, `Client`s are moved from `previous`
+     * to `current` as they hit the endpoint. Once `windowMs` has elapsed, all clients
+     * left in `previous`, i.e., those that have not made any recent requests, are
+     * known to be expired and can be deleted in bulk.
+     */
+    this.previous = /* @__PURE__ */ new Map();
+    this.current = /* @__PURE__ */ new Map();
+    /**
+     * Confirmation that the keys incremented in once instance of MemoryStore
+     * cannot affect other instances.
+     */
+    this.localKeys = true;
+  }
+  /**
+   * Method that initializes the store.
+   *
+   * @param options {Options} - The options used to setup the middleware.
+   */
+  init(options) {
+    this.windowMs = options.windowMs;
+    if (this.interval) clearInterval(this.interval);
+    this.interval = setInterval(() => {
+      this.clearExpired();
+    }, this.windowMs);
+    this.interval.unref?.();
+  }
+  /**
+   * Method to fetch a client's hit count and reset time.
+   *
+   * @param key {string} - The identifier for a client.
+   *
+   * @returns {ClientRateLimitInfo | undefined} - The number of hits and reset time for that client.
+   *
+   * @public
+   */
+  async get(key) {
+    return this.current.get(key) ?? this.previous.get(key);
+  }
+  /**
+   * Method to increment a client's hit counter.
+   *
+   * @param key {string} - The identifier for a client.
+   *
+   * @returns {ClientRateLimitInfo} - The number of hits and reset time for that client.
+   *
+   * @public
+   */
+  async increment(key) {
+    const client = this.getClient(key);
+    const now = Date.now();
+    if (client.resetTime.getTime() <= now) {
+      this.resetClient(client, now);
+    }
+    client.totalHits++;
+    return client;
+  }
+  /**
+   * Method to decrement a client's hit counter.
+   *
+   * @param key {string} - The identifier for a client.
+   *
+   * @public
+   */
+  async decrement(key) {
+    const client = this.getClient(key);
+    if (client.totalHits > 0) client.totalHits--;
+  }
+  /**
+   * Method to reset a client's hit counter.
+   *
+   * @param key {string} - The identifier for a client.
+   *
+   * @public
+   */
+  async resetKey(key) {
+    this.current.delete(key);
+    this.previous.delete(key);
+  }
+  /**
+   * Method to reset everyone's hit counter.
+   *
+   * @public
+   */
+  async resetAll() {
+    this.current.clear();
+    this.previous.clear();
+  }
+  /**
+   * Method to stop the timer (if currently running) and prevent any memory
+   * leaks.
+   *
+   * @public
+   */
+  shutdown() {
+    clearInterval(this.interval);
+    void this.resetAll();
+  }
+  /**
+   * Recycles a client by setting its hit count to zero, and reset time to
+   * `windowMs` milliseconds from now.
+   *
+   * NOT to be confused with `#resetKey()`, which removes a client from both the
+   * `current` and `previous` maps.
+   *
+   * @param client {Client} - The client to recycle.
+   * @param now {number} - The current time, to which the `windowMs` is added to get the `resetTime` for the client.
+   *
+   * @return {Client} - The modified client that was passed in, to allow for chaining.
+   */
+  resetClient(client, now = Date.now()) {
+    client.totalHits = 0;
+    client.resetTime.setTime(now + this.windowMs);
+    return client;
+  }
+  /**
+   * Retrieves or creates a client, given a key. Also ensures that the client being
+   * returned is in the `current` map.
+   *
+   * @param key {string} - The key under which the client is (or is to be) stored.
+   *
+   * @returns {Client} - The requested client.
+   */
+  getClient(key) {
+    if (this.current.has(key)) return this.current.get(key);
+    let client;
+    if (this.previous.has(key)) {
+      client = this.previous.get(key);
+      this.previous.delete(key);
+    } else {
+      client = { totalHits: 0, resetTime: /* @__PURE__ */ new Date() };
+      this.resetClient(client);
+    }
+    this.current.set(key, client);
+    return client;
+  }
+  /**
+   * Move current clients to previous, create a new map for current.
+   *
+   * This function is called every `windowMs`.
+   */
+  clearExpired() {
+    this.previous = this.current;
+    this.current = /* @__PURE__ */ new Map();
+  }
+};
+
+// source/rate-limit.ts
+var import_node_net3 = require("node:net");
+
+// source/headers.ts
+var import_node_buffer = require("node:buffer");
+var import_node_crypto = require("node:crypto");
+var SUPPORTED_DRAFT_VERSIONS = [
+  "draft-6",
+  "draft-7",
+  "draft-8"
+];
+var getResetSeconds = (windowMs, resetTime) => {
+  let resetSeconds;
+  if (resetTime) {
+    const deltaSeconds = Math.ceil((resetTime.getTime() - Date.now()) / 1e3);
+    resetSeconds = Math.max(0, deltaSeconds);
+  } else {
+    resetSeconds = Math.ceil(windowMs / 1e3);
+  }
+  return resetSeconds;
+};
+var getPartitionKey = (key) => {
+  const hash = (0, import_node_crypto.createHash)("sha256");
+  hash.update(key);
+  const partitionKey = hash.digest("hex").slice(0, 12);
+  return import_node_buffer.Buffer.from(partitionKey).toString("base64");
+};
+var setLegacyHeaders = (response, info) => {
+  if (response.headersSent) return;
+  response.setHeader("X-RateLimit-Limit", info.limit.toString());
+  response.setHeader("X-RateLimit-Remaining", info.remaining.toString());
+  if (info.resetTime instanceof Date) {
+    response.setHeader("Date", (/* @__PURE__ */ new Date()).toUTCString());
+    response.setHeader(
+      "X-RateLimit-Reset",
+      Math.ceil(info.resetTime.getTime() / 1e3).toString()
+    );
+  }
+};
+var setDraft6Headers = (response, info, windowMs) => {
+  if (response.headersSent) return;
+  const windowSeconds = Math.ceil(windowMs / 1e3);
+  const resetSeconds = getResetSeconds(windowMs, info.resetTime);
+  response.setHeader("RateLimit-Policy", `${info.limit};w=${windowSeconds}`);
+  response.setHeader("RateLimit-Limit", info.limit.toString());
+  response.setHeader("RateLimit-Remaining", info.remaining.toString());
+  if (resetSeconds)
+    response.setHeader("RateLimit-Reset", resetSeconds.toString());
+};
+var setDraft7Headers = (response, info, windowMs) => {
+  if (response.headersSent) return;
+  const windowSeconds = Math.ceil(windowMs / 1e3);
+  const resetSeconds = getResetSeconds(windowMs, info.resetTime);
+  response.setHeader("RateLimit-Policy", `${info.limit};w=${windowSeconds}`);
+  response.setHeader(
+    "RateLimit",
+    `limit=${info.limit}, remaining=${info.remaining}, reset=${resetSeconds}`
+  );
+};
+var setDraft8Headers = (response, info, windowMs, name, key) => {
+  if (response.headersSent) return;
+  const windowSeconds = Math.ceil(windowMs / 1e3);
+  const resetSeconds = getResetSeconds(windowMs, info.resetTime);
+  const partitionKey = getPartitionKey(key);
+  const header = `r=${info.remaining}; t=${resetSeconds}`;
+  const policy = `q=${info.limit}; w=${windowSeconds}; pk=:${partitionKey}:`;
+  response.append("RateLimit", `"${name}"; ${header}`);
+  response.append("RateLimit-Policy", `"${name}"; ${policy}`);
+};
+var setRetryAfterHeader = (response, info, windowMs) => {
+  if (response.headersSent) return;
+  const resetSeconds = getResetSeconds(windowMs, info.resetTime);
+  response.setHeader("Retry-After", resetSeconds.toString());
+};
+
+// source/utils.ts
+var omitUndefinedProperties = (passedOptions) => {
+  const omittedOptions = {};
+  for (const k of Object.keys(passedOptions)) {
+    const key = k;
+    if (passedOptions[key] !== void 0) {
+      omittedOptions[key] = passedOptions[key];
+    }
+  }
+  return omittedOptions;
+};
+
+// source/validations.ts
+var import_node_net2 = require("node:net");
+var ValidationError = class extends Error {
+  /**
+   * The code must be a string, in snake case and all capital, that starts with
+   * the substring `ERR_ERL_`.
+   *
+   * The message must be a string, starting with an uppercase character,
+   * describing the issue in detail.
+   */
+  constructor(code, message) {
+    const url = `https://express-rate-limit.github.io/${code}/`;
+    super(`${message} See ${url} for more information.`);
+    this.name = this.constructor.name;
+    this.code = code;
+    this.help = url;
+  }
+};
+var ChangeWarning = class extends ValidationError {
+};
+var usedStores = /* @__PURE__ */ new Set();
+var singleCountKeys = /* @__PURE__ */ new WeakMap();
+var validations = {
+  enabled: {
+    default: true
+  },
+  // Should be EnabledValidations type, but that's a circular reference
+  disable() {
+    for (const k of Object.keys(this.enabled)) this.enabled[k] = false;
+  },
+  /**
+   * Checks whether the IP address is valid, and that it does not have a port
+   * number in it.
+   *
+   * See https://github.com/express-rate-limit/express-rate-limit/wiki/Error-Codes#err_erl_invalid_ip_address.
+   *
+   * @param ip {string | undefined} - The IP address provided by Express as request.ip.
+   *
+   * @returns {void}
+   */
+  ip(ip) {
+    if (ip === void 0) {
+      throw new ValidationError(
+        "ERR_ERL_UNDEFINED_IP_ADDRESS",
+        `An undefined 'request.ip' was detected. This might indicate a misconfiguration or the connection being destroyed prematurely.`
+      );
+    }
+    if (!(0, import_node_net2.isIP)(ip)) {
+      throw new ValidationError(
+        "ERR_ERL_INVALID_IP_ADDRESS",
+        `An invalid 'request.ip' (${ip}) was detected. Consider passing a custom 'keyGenerator' function to the rate limiter.`
+      );
+    }
+  },
+  /**
+   * Makes sure the trust proxy setting is not set to `true`.
+   *
+   * See https://github.com/express-rate-limit/express-rate-limit/wiki/Error-Codes#err_erl_permissive_trust_proxy.
+   *
+   * @param request {Request} - The Express request object.
+   *
+   * @returns {void}
+   */
+  trustProxy(request) {
+    if (request.app.get("trust proxy") === true) {
+      throw new ValidationError(
+        "ERR_ERL_PERMISSIVE_TRUST_PROXY",
+        `The Express 'trust proxy' setting is true, which allows anyone to trivially bypass IP-based rate limiting.`
+      );
+    }
+  },
+  /**
+   * Makes sure the trust proxy setting is set in case the `X-Forwarded-For`
+   * header is present.
+   *
+   * See https://github.com/express-rate-limit/express-rate-limit/wiki/Error-Codes#err_erl_unset_trust_proxy.
+   *
+   * @param request {Request} - The Express request object.
+   *
+   * @returns {void}
+   */
+  xForwardedForHeader(request) {
+    if (request.headers["x-forwarded-for"] && request.app.get("trust proxy") === false) {
+      throw new ValidationError(
+        "ERR_ERL_UNEXPECTED_X_FORWARDED_FOR",
+        `The 'X-Forwarded-For' header is set but the Express 'trust proxy' setting is false (default). This could indicate a misconfiguration which would prevent express-rate-limit from accurately identifying users.`
+      );
+    }
+  },
+  /**
+   * Ensures totalHits value from store is a positive integer.
+   *
+   * @param hits {any} - The `totalHits` returned by the store.
+   */
+  positiveHits(hits) {
+    if (typeof hits !== "number" || hits < 1 || hits !== Math.round(hits)) {
+      throw new ValidationError(
+        "ERR_ERL_INVALID_HITS",
+        `The totalHits value returned from the store must be a positive integer, got ${hits}`
+      );
+    }
+  },
+  /**
+   * Ensures a single store instance is not used with multiple express-rate-limit instances
+   */
+  unsharedStore(store) {
+    if (usedStores.has(store)) {
+      const maybeUniquePrefix = store?.localKeys ? "" : " (with a unique prefix)";
+      throw new ValidationError(
+        "ERR_ERL_STORE_REUSE",
+        `A Store instance must not be shared across multiple rate limiters. Create a new instance of ${store.constructor.name}${maybeUniquePrefix} for each limiter instead.`
+      );
+    }
+    usedStores.add(store);
+  },
+  /**
+   * Ensures a given key is incremented only once per request.
+   *
+   * @param request {Request} - The Express request object.
+   * @param store {Store} - The store class.
+   * @param key {string} - The key used to store the client's hit count.
+   *
+   * @returns {void}
+   */
+  singleCount(request, store, key) {
+    let storeKeys = singleCountKeys.get(request);
+    if (!storeKeys) {
+      storeKeys = /* @__PURE__ */ new Map();
+      singleCountKeys.set(request, storeKeys);
+    }
+    const storeKey = store.localKeys ? store : store.constructor.name;
+    let keys = storeKeys.get(storeKey);
+    if (!keys) {
+      keys = [];
+      storeKeys.set(storeKey, keys);
+    }
+    const prefixedKey = `${store.prefix ?? ""}${key}`;
+    if (keys.includes(prefixedKey)) {
+      throw new ValidationError(
+        "ERR_ERL_DOUBLE_COUNT",
+        `The hit count for ${key} was incremented more than once for a single request.`
+      );
+    }
+    keys.push(prefixedKey);
+  },
+  /**
+   * Warns the user that the behaviour for `max: 0` / `limit: 0` is
+   * changing in the next major release.
+   *
+   * @param limit {number} - The maximum number of hits per client.
+   *
+   * @returns {void}
+   */
+  limit(limit) {
+    if (limit === 0) {
+      throw new ChangeWarning(
+        "WRN_ERL_MAX_ZERO",
+        "Setting limit or max to 0 disables rate limiting in express-rate-limit v6 and older, but will cause all requests to be blocked in v7"
+      );
+    }
+  },
+  /**
+   * Warns the user that the `draft_polli_ratelimit_headers` option is deprecated
+   * and will be removed in the next major release.
+   *
+   * @param draft_polli_ratelimit_headers {any | undefined} - The now-deprecated setting that was used to enable standard headers.
+   *
+   * @returns {void}
+   */
+  draftPolliHeaders(draft_polli_ratelimit_headers) {
+    if (draft_polli_ratelimit_headers) {
+      throw new ChangeWarning(
+        "WRN_ERL_DEPRECATED_DRAFT_POLLI_HEADERS",
+        `The draft_polli_ratelimit_headers configuration option is deprecated and has been removed in express-rate-limit v7, please set standardHeaders: 'draft-6' instead.`
+      );
+    }
+  },
+  /**
+   * Warns the user that the `onLimitReached` option is deprecated and
+   * will be removed in the next major release.
+   *
+   * @param onLimitReached {any | undefined} - The maximum number of hits per client.
+   *
+   * @returns {void}
+   */
+  onLimitReached(onLimitReached) {
+    if (onLimitReached) {
+      throw new ChangeWarning(
+        "WRN_ERL_DEPRECATED_ON_LIMIT_REACHED",
+        "The onLimitReached configuration option is deprecated and has been removed in express-rate-limit v7."
+      );
+    }
+  },
+  /**
+   * Warns the user when an invalid/unsupported version of the draft spec is passed.
+   *
+   * @param version {any | undefined} - The version passed by the user.
+   *
+   * @returns {void}
+   */
+  headersDraftVersion(version) {
+    if (typeof version !== "string" || // @ts-expect-error This is fine. If version is not in the array, it will just return false.
+    !SUPPORTED_DRAFT_VERSIONS.includes(version)) {
+      const versionString = SUPPORTED_DRAFT_VERSIONS.join(", ");
+      throw new ValidationError(
+        "ERR_ERL_HEADERS_UNSUPPORTED_DRAFT_VERSION",
+        `standardHeaders: only the following versions of the IETF draft specification are supported: ${versionString}.`
+      );
+    }
+  },
+  /**
+   * Warns the user when the selected headers option requires a reset time but
+   * the store does not provide one.
+   *
+   * @param resetTime {Date | undefined} - The timestamp when the client's hit count will be reset.
+   *
+   * @returns {void}
+   */
+  headersResetTime(resetTime) {
+    if (!resetTime) {
+      throw new ValidationError(
+        "ERR_ERL_HEADERS_NO_RESET",
+        `standardHeaders:  'draft-7' requires a 'resetTime', but the store did not provide one. The 'windowMs' value will be used instead, which may cause clients to wait longer than necessary.`
+      );
+    }
+  },
+  /**
+   * Checks the options.validate setting to ensure that only recognized
+   * validations are enabled or disabled.
+   *
+   * If any unrecognized values are found, an error is logged that
+   * includes the list of supported vaidations.
+   */
+  validationsConfig() {
+    const supportedValidations = Object.keys(this).filter(
+      (k) => !["enabled", "disable"].includes(k)
+    );
+    supportedValidations.push("default");
+    for (const key of Object.keys(this.enabled)) {
+      if (!supportedValidations.includes(key)) {
+        throw new ValidationError(
+          "ERR_ERL_UNKNOWN_VALIDATION",
+          `options.validate.${key} is not recognized. Supported validate options are: ${supportedValidations.join(
+            ", "
+          )}.`
+        );
+      }
+    }
+  },
+  /**
+   * Checks to see if the instance was created inside of a request handler,
+   * which would prevent it from working correctly, with the default memory
+   * store (or any other store with localKeys.)
+   */
+  creationStack(store) {
+    const { stack } = new Error(
+      "express-rate-limit validation check (set options.validate.creationStack=false to disable)"
+    );
+    if (stack?.includes("Layer.handle [as handle_request]") || // express v4
+    stack?.includes("Layer.handleRequest")) {
+      if (!store.localKeys) {
+        throw new ValidationError(
+          "ERR_ERL_CREATED_IN_REQUEST_HANDLER",
+          "express-rate-limit instance should *usually* be created at app initialization, not when responding to a request."
+        );
+      }
+      throw new ValidationError(
+        "ERR_ERL_CREATED_IN_REQUEST_HANDLER",
+        "express-rate-limit instance should be created at app initialization, not when responding to a request."
+      );
+    }
+  },
+  ipv6Subnet(ipv6Subnet) {
+    if (ipv6Subnet === false) {
+      return;
+    }
+    if (!Number.isInteger(ipv6Subnet) || ipv6Subnet < 32 || ipv6Subnet > 64) {
+      throw new ValidationError(
+        "ERR_ERL_IPV6_SUBNET",
+        `Unexpected ipv6Subnet value: ${ipv6Subnet}. Expected an integer between 32 and 64 (usually 48-64).`
+      );
+    }
+  },
+  ipv6SubnetOrKeyGenerator(options) {
+    if (options.ipv6Subnet !== void 0 && options.keyGenerator) {
+      throw new ValidationError(
+        "ERR_ERL_IPV6SUBNET_OR_KEYGENERATOR",
+        `Incompatible options: the 'ipv6Subnet' option is ignored when a custom 'keyGenerator' function is also set.`
+      );
+    }
+  },
+  keyGeneratorIpFallback(keyGenerator) {
+    if (!keyGenerator) {
+      return;
+    }
+    const src = keyGenerator.toString();
+    if ((src.includes("req.ip") || src.includes("request.ip")) && !src.includes("ipKeyGenerator")) {
+      throw new ValidationError(
+        "ERR_ERL_KEY_GEN_IPV6",
+        "Custom keyGenerator appears to use request IP without calling the ipKeyGenerator helper function for IPv6 addresses. This could allow IPv6 users to bypass limits."
+      );
+    }
+  }
+};
+var getValidations = (_enabled) => {
+  let enabled;
+  if (typeof _enabled === "boolean") {
+    enabled = {
+      default: _enabled
+    };
+  } else {
+    enabled = {
+      default: true,
+      ..._enabled
+    };
+  }
+  const wrappedValidations = { enabled };
+  for (const [name, validation] of Object.entries(validations)) {
+    if (typeof validation === "function")
+      wrappedValidations[name] = (...args) => {
+        if (!(enabled[name] ?? enabled.default)) {
+          return;
+        }
+        try {
+          ;
+          validation.apply(
+            wrappedValidations,
+            args
+          );
+        } catch (error) {
+          if (error instanceof ChangeWarning) console.warn(error);
+          else console.error(error);
+        }
+      };
+  }
+  return wrappedValidations;
+};
+
+// source/rate-limit.ts
+var isLegacyStore = (store) => (
+  // Check that `incr` exists but `increment` does not - store authors might want
+  // to keep both around for backwards compatibility.
+  typeof store.incr === "function" && typeof store.increment !== "function"
+);
+var promisifyStore = (passedStore) => {
+  if (!isLegacyStore(passedStore)) {
+    return passedStore;
+  }
+  const legacyStore = passedStore;
+  class PromisifiedStore {
+    async increment(key) {
+      return new Promise((resolve, reject) => {
+        legacyStore.incr(
+          key,
+          (error, totalHits, resetTime) => {
+            if (error) reject(error);
+            resolve({ totalHits, resetTime });
+          }
+        );
+      });
+    }
+    async decrement(key) {
+      return legacyStore.decrement(key);
+    }
+    async resetKey(key) {
+      return legacyStore.resetKey(key);
+    }
+    /* istanbul ignore next */
+    async resetAll() {
+      if (typeof legacyStore.resetAll === "function")
+        return legacyStore.resetAll();
+    }
+  }
+  return new PromisifiedStore();
+};
+var getOptionsFromConfig = (config) => {
+  const { validations: validations2, ...directlyPassableEntries } = config;
+  return {
+    ...directlyPassableEntries,
+    validate: validations2.enabled
+  };
+};
+var parseOptions = (passedOptions) => {
+  const notUndefinedOptions = omitUndefinedProperties(passedOptions);
+  const validations2 = getValidations(notUndefinedOptions?.validate ?? true);
+  validations2.validationsConfig();
+  validations2.draftPolliHeaders(
+    // @ts-expect-error see the note above.
+    notUndefinedOptions.draft_polli_ratelimit_headers
+  );
+  validations2.onLimitReached(notUndefinedOptions.onLimitReached);
+  if (notUndefinedOptions.ipv6Subnet !== void 0 && typeof notUndefinedOptions.ipv6Subnet !== "function") {
+    validations2.ipv6Subnet(notUndefinedOptions.ipv6Subnet);
+  }
+  validations2.keyGeneratorIpFallback(notUndefinedOptions.keyGenerator);
+  validations2.ipv6SubnetOrKeyGenerator(notUndefinedOptions);
+  let standardHeaders = notUndefinedOptions.standardHeaders ?? false;
+  if (standardHeaders === true) standardHeaders = "draft-6";
+  const config = {
+    windowMs: 60 * 1e3,
+    limit: passedOptions.max ?? 5,
+    // `max` is deprecated, but support it anyways.
+    message: "Too many requests, please try again later.",
+    statusCode: 429,
+    legacyHeaders: passedOptions.headers ?? true,
+    identifier(request, _response) {
+      let duration = "";
+      const property = config.requestPropertyName;
+      const { limit } = request[property];
+      const seconds = config.windowMs / 1e3;
+      const minutes = config.windowMs / (1e3 * 60);
+      const hours = config.windowMs / (1e3 * 60 * 60);
+      const days = config.windowMs / (1e3 * 60 * 60 * 24);
+      if (seconds < 60) duration = `${seconds}sec`;
+      else if (minutes < 60) duration = `${minutes}min`;
+      else if (hours < 24) duration = `${hours}hr${hours > 1 ? "s" : ""}`;
+      else duration = `${days}day${days > 1 ? "s" : ""}`;
+      return `${limit}-in-${duration}`;
+    },
+    requestPropertyName: "rateLimit",
+    skipFailedRequests: false,
+    skipSuccessfulRequests: false,
+    requestWasSuccessful: (_request, response) => response.statusCode < 400,
+    skip: (_request, _response) => false,
+    async keyGenerator(request, response) {
+      validations2.ip(request.ip);
+      validations2.trustProxy(request);
+      validations2.xForwardedForHeader(request);
+      const ip = request.ip;
+      let subnet = 56;
+      if ((0, import_node_net3.isIPv6)(ip)) {
+        subnet = typeof config.ipv6Subnet === "function" ? await config.ipv6Subnet(request, response) : config.ipv6Subnet;
+        if (typeof config.ipv6Subnet === "function")
+          validations2.ipv6Subnet(subnet);
+      }
+      return ipKeyGenerator(ip, subnet);
+    },
+    ipv6Subnet: 56,
+    async handler(request, response, _next, _optionsUsed) {
+      response.status(config.statusCode);
+      const message = typeof config.message === "function" ? await config.message(
+        request,
+        response
+      ) : config.message;
+      if (!response.writableEnded) response.send(message);
+    },
+    passOnStoreError: false,
+    // Allow the default options to be overridden by the passed options.
+    ...notUndefinedOptions,
+    // `standardHeaders` is resolved into a draft version above, use that.
+    standardHeaders,
+    // Note that this field is declared after the user's options are spread in,
+    // so that this field doesn't get overridden with an un-promisified store!
+    store: promisifyStore(notUndefinedOptions.store ?? new MemoryStore()),
+    // Print an error to the console if a few known misconfigurations are detected.
+    validations: validations2
+  };
+  if (typeof config.store.increment !== "function" || typeof config.store.decrement !== "function" || typeof config.store.resetKey !== "function" || config.store.resetAll !== void 0 && typeof config.store.resetAll !== "function" || config.store.init !== void 0 && typeof config.store.init !== "function") {
+    throw new TypeError(
+      "An invalid store was passed. Please ensure that the store is a class that implements the `Store` interface."
+    );
+  }
+  return config;
+};
+var handleAsyncErrors = (fn) => async (request, response, next) => {
+  try {
+    await Promise.resolve(fn(request, response, next)).catch(next);
+  } catch (error) {
+    next(error);
+  }
+};
+var rateLimit = (passedOptions) => {
+  const config = parseOptions(passedOptions ?? {});
+  const options = getOptionsFromConfig(config);
+  config.validations.creationStack(config.store);
+  config.validations.unsharedStore(config.store);
+  if (typeof config.store.init === "function") config.store.init(options);
+  const middleware = handleAsyncErrors(
+    async (request, response, next) => {
+      const skip = await config.skip(request, response);
+      if (skip) {
+        next();
+        return;
+      }
+      const augmentedRequest = request;
+      const key = await config.keyGenerator(request, response);
+      let totalHits = 0;
+      let resetTime;
+      try {
+        const incrementResult = await config.store.increment(key);
+        totalHits = incrementResult.totalHits;
+        resetTime = incrementResult.resetTime;
+      } catch (error) {
+        if (config.passOnStoreError) {
+          console.error(
+            "express-rate-limit: error from store, allowing request without rate-limiting.",
+            error
+          );
+          next();
+          return;
+        }
+        throw error;
+      }
+      config.validations.positiveHits(totalHits);
+      config.validations.singleCount(request, config.store, key);
+      const retrieveLimit = typeof config.limit === "function" ? config.limit(request, response) : config.limit;
+      const limit = await retrieveLimit;
+      config.validations.limit(limit);
+      const info = {
+        limit,
+        used: totalHits,
+        remaining: Math.max(limit - totalHits, 0),
+        resetTime,
+        key
+      };
+      Object.defineProperty(info, "current", {
+        configurable: false,
+        enumerable: false,
+        value: totalHits
+      });
+      augmentedRequest[config.requestPropertyName] = info;
+      if (config.legacyHeaders && !response.headersSent) {
+        setLegacyHeaders(response, info);
+      }
+      if (config.standardHeaders && !response.headersSent) {
+        switch (config.standardHeaders) {
+          case "draft-6": {
+            setDraft6Headers(response, info, config.windowMs);
+            break;
+          }
+          case "draft-7": {
+            config.validations.headersResetTime(info.resetTime);
+            setDraft7Headers(response, info, config.windowMs);
+            break;
+          }
+          case "draft-8": {
+            const retrieveName = typeof config.identifier === "function" ? config.identifier(request, response) : config.identifier;
+            const name = await retrieveName;
+            config.validations.headersResetTime(info.resetTime);
+            setDraft8Headers(response, info, config.windowMs, name, key);
+            break;
+          }
+          default: {
+            config.validations.headersDraftVersion(config.standardHeaders);
+            break;
+          }
+        }
+      }
+      if (config.skipFailedRequests || config.skipSuccessfulRequests) {
+        let decremented = false;
+        const decrementKey = async () => {
+          if (!decremented) {
+            await config.store.decrement(key);
+            decremented = true;
+          }
+        };
+        if (config.skipFailedRequests) {
+          response.on("finish", async () => {
+            if (!await config.requestWasSuccessful(request, response))
+              await decrementKey();
+          });
+          response.on("close", async () => {
+            if (!response.writableEnded) await decrementKey();
+          });
+          response.on("error", async () => {
+            await decrementKey();
+          });
+        }
+        if (config.skipSuccessfulRequests) {
+          response.on("finish", async () => {
+            if (await config.requestWasSuccessful(request, response))
+              await decrementKey();
+          });
+        }
+      }
+      config.validations.disable();
+      if (totalHits > limit) {
+        if (config.legacyHeaders || config.standardHeaders) {
+          setRetryAfterHeader(response, info, config.windowMs);
+        }
+        config.handler(request, response, next, options);
+        return;
+      }
+      next();
+    }
+  );
+  const getThrowFn = () => {
+    throw new Error("The current store does not support the get/getKey method");
+  };
+  middleware.resetKey = config.store.resetKey.bind(config.store);
+  middleware.getKey = typeof config.store.get === "function" ? config.store.get.bind(config.store) : getThrowFn;
+  return middleware;
+};
+var rate_limit_default = rateLimit;
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  MemoryStore,
+  ipKeyGenerator,
+  rateLimit
+});
+module.exports = Object.assign(rateLimit, module.exports);

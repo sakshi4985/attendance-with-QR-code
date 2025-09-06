@@ -1,280 +1,266 @@
-# depd
+[![Express Logo](https://i.cloudup.com/zfY6lL7eFa-3000x3000.png)](https://expressjs.com/)
+
+**Fast, unopinionated, minimalist web framework for [Node.js](https://nodejs.org).**
+
+**This project has a [Code of Conduct][].**
+
+## Table of contents
+
+* [Installation](#Installation)
+* [Features](#Features)
+* [Docs & Community](#docs--community)
+* [Quick Start](#Quick-Start)
+* [Running Tests](#Running-Tests)
+* [Philosophy](#Philosophy)
+* [Examples](#Examples)
+* [Contributing to Express](#Contributing)
+* [TC (Technical Committee)](#tc-technical-committee)
+* [Triagers](#triagers)
+* [License](#license)
+
 
 [![NPM Version][npm-version-image]][npm-url]
-[![NPM Downloads][npm-downloads-image]][npm-url]
-[![Node.js Version][node-image]][node-url]
-[![Linux Build][travis-image]][travis-url]
-[![Windows Build][appveyor-image]][appveyor-url]
-[![Coverage Status][coveralls-image]][coveralls-url]
+[![NPM Downloads][npm-downloads-image]][npm-downloads-url]
+[![OpenSSF Scorecard Badge][ossf-scorecard-badge]][ossf-scorecard-visualizer]
 
-Deprecate all the things
-
-> With great modules comes great responsibility; mark things deprecated!
-
-## Install
-
-This module is installed directly using `npm`:
-
-```sh
-$ npm install depd
-```
-
-This module can also be bundled with systems like
-[Browserify](http://browserify.org/) or [webpack](https://webpack.github.io/),
-though by default this module will alter it's API to no longer display or
-track deprecations.
-
-## API
-
-<!-- eslint-disable no-unused-vars -->
 
 ```js
-var deprecate = require('depd')('my-module')
+import express from 'express'
+
+const app = express()
+
+app.get('/', (req, res) => {
+  res.send('Hello World')
+})
+
+app.listen(3000)
 ```
 
-This library allows you to display deprecation messages to your users.
-This library goes above and beyond with deprecation warnings by
-introspection of the call stack (but only the bits that it is interested
-in).
+## Installation
 
-Instead of just warning on the first invocation of a deprecated
-function and never again, this module will warn on the first invocation
-of a deprecated function per unique call site, making it ideal to alert
-users of all deprecated uses across the code base, rather than just
-whatever happens to execute first.
+This is a [Node.js](https://nodejs.org/en/) module available through the
+[npm registry](https://www.npmjs.com/).
 
-The deprecation warnings from this module also include the file and line
-information for the call into the module that the deprecated function was
-in.
+Before installing, [download and install Node.js](https://nodejs.org/en/download/).
+Node.js 18 or higher is required.
 
-**NOTE** this library has a similar interface to the `debug` module, and
-this module uses the calling file to get the boundary for the call stacks,
-so you should always create a new `deprecate` object in each file and not
-within some central file.
+If this is a brand new project, make sure to create a `package.json` first with
+the [`npm init` command](https://docs.npmjs.com/creating-a-package-json-file).
 
-### depd(namespace)
+Installation is done using the
+[`npm install` command](https://docs.npmjs.com/getting-started/installing-npm-packages-locally):
 
-Create a new deprecate function that uses the given namespace name in the
-messages and will display the call site prior to the stack entering the
-file this function was called from. It is highly suggested you use the
-name of your module as the namespace.
-
-### deprecate(message)
-
-Call this function from deprecated code to display a deprecation message.
-This message will appear once per unique caller site. Caller site is the
-first call site in the stack in a different file from the caller of this
-function.
-
-If the message is omitted, a message is generated for you based on the site
-of the `deprecate()` call and will display the name of the function called,
-similar to the name displayed in a stack trace.
-
-### deprecate.function(fn, message)
-
-Call this function to wrap a given function in a deprecation message on any
-call to the function. An optional message can be supplied to provide a custom
-message.
-
-### deprecate.property(obj, prop, message)
-
-Call this function to wrap a given property on object in a deprecation message
-on any accessing or setting of the property. An optional message can be supplied
-to provide a custom message.
-
-The method must be called on the object where the property belongs (not
-inherited from the prototype).
-
-If the property is a data descriptor, it will be converted to an accessor
-descriptor in order to display the deprecation message.
-
-### process.on('deprecation', fn)
-
-This module will allow easy capturing of deprecation errors by emitting the
-errors as the type "deprecation" on the global `process`. If there are no
-listeners for this type, the errors are written to STDERR as normal, but if
-there are any listeners, nothing will be written to STDERR and instead only
-emitted. From there, you can write the errors in a different format or to a
-logging source.
-
-The error represents the deprecation and is emitted only once with the same
-rules as writing to STDERR. The error has the following properties:
-
-  - `message` - This is the message given by the library
-  - `name` - This is always `'DeprecationError'`
-  - `namespace` - This is the namespace the deprecation came from
-  - `stack` - This is the stack of the call to the deprecated thing
-
-Example `error.stack` output:
-
-```
-DeprecationError: my-cool-module deprecated oldfunction
-    at Object.<anonymous> ([eval]-wrapper:6:22)
-    at Module._compile (module.js:456:26)
-    at evalScript (node.js:532:25)
-    at startup (node.js:80:7)
-    at node.js:902:3
+```bash
+npm install express
 ```
 
-### process.env.NO_DEPRECATION
+Follow [our installing guide](https://expressjs.com/en/starter/installing.html)
+for more information.
 
-As a user of modules that are deprecated, the environment variable `NO_DEPRECATION`
-is provided as a quick solution to silencing deprecation warnings from being
-output. The format of this is similar to that of `DEBUG`:
+## Features
 
-```sh
-$ NO_DEPRECATION=my-module,othermod node app.js
+  * Robust routing
+  * Focus on high performance
+  * Super-high test coverage
+  * HTTP helpers (redirection, caching, etc)
+  * View system supporting 14+ template engines
+  * Content negotiation
+  * Executable for generating applications quickly
+
+## Docs & Community
+
+  * [Website and Documentation](https://expressjs.com/) - [[website repo](https://github.com/expressjs/expressjs.com)]
+  * [GitHub Organization](https://github.com/expressjs) for Official Middleware & Modules
+  * [Github Discussions](https://github.com/expressjs/discussions) for discussion on the development and usage of Express
+
+**PROTIP** Be sure to read the [migration guide to v5](https://expressjs.com/en/guide/migrating-5)
+
+## Quick Start
+
+  The quickest way to get started with express is to utilize the executable [`express(1)`](https://github.com/expressjs/generator) to generate an application as shown below:
+
+  Install the executable. The executable's major version will match Express's:
+
+```bash
+npm install -g express-generator@4
 ```
 
-This will suppress deprecations from being output for "my-module" and "othermod".
-The value is a list of comma-separated namespaces. To suppress every warning
-across all namespaces, use the value `*` for a namespace.
+  Create the app:
 
-Providing the argument `--no-deprecation` to the `node` executable will suppress
-all deprecations (only available in Node.js 0.8 or higher).
-
-**NOTE** This will not suppress the deperecations given to any "deprecation"
-event listeners, just the output to STDERR.
-
-### process.env.TRACE_DEPRECATION
-
-As a user of modules that are deprecated, the environment variable `TRACE_DEPRECATION`
-is provided as a solution to getting more detailed location information in deprecation
-warnings by including the entire stack trace. The format of this is the same as
-`NO_DEPRECATION`:
-
-```sh
-$ TRACE_DEPRECATION=my-module,othermod node app.js
+```bash
+express /tmp/foo && cd /tmp/foo
 ```
 
-This will include stack traces for deprecations being output for "my-module" and
-"othermod". The value is a list of comma-separated namespaces. To trace every
-warning across all namespaces, use the value `*` for a namespace.
+  Install dependencies:
 
-Providing the argument `--trace-deprecation` to the `node` executable will trace
-all deprecations (only available in Node.js 0.8 or higher).
-
-**NOTE** This will not trace the deperecations silenced by `NO_DEPRECATION`.
-
-## Display
-
-![message](files/message.png)
-
-When a user calls a function in your library that you mark deprecated, they
-will see the following written to STDERR (in the given colors, similar colors
-and layout to the `debug` module):
-
-```
-bright cyan    bright yellow
-|              |          reset       cyan
-|              |          |           |
-▼              ▼          ▼           ▼
-my-cool-module deprecated oldfunction [eval]-wrapper:6:22
-▲              ▲          ▲           ▲
-|              |          |           |
-namespace      |          |           location of mycoolmod.oldfunction() call
-               |          deprecation message
-               the word "deprecated"
+```bash
+npm install
 ```
 
-If the user redirects their STDERR to a file or somewhere that does not support
-colors, they see (similar layout to the `debug` module):
+  Start the server:
 
+```bash
+npm start
 ```
-Sun, 15 Jun 2014 05:21:37 GMT my-cool-module deprecated oldfunction at [eval]-wrapper:6:22
-▲                             ▲              ▲          ▲              ▲
-|                             |              |          |              |
-timestamp of message          namespace      |          |             location of mycoolmod.oldfunction() call
-                                             |          deprecation message
-                                             the word "deprecated"
-```
+
+  View the website at: http://localhost:3000
+
+## Philosophy
+
+  The Express philosophy is to provide small, robust tooling for HTTP servers, making
+  it a great solution for single page applications, websites, hybrids, or public
+  HTTP APIs.
+
+  Express does not force you to use any specific ORM or template engine. With support for over
+  14 template engines via [@ladjs/consolidate](https://github.com/ladjs/consolidate),
+  you can quickly craft your perfect framework.
 
 ## Examples
 
-### Deprecating all calls to a function
+  To view the examples, clone the Express repository:
 
-This will display a deprecated message about "oldfunction" being deprecated
-from "my-module" on STDERR.
-
-```js
-var deprecate = require('depd')('my-cool-module')
-
-// message automatically derived from function name
-// Object.oldfunction
-exports.oldfunction = deprecate.function(function oldfunction () {
-  // all calls to function are deprecated
-})
-
-// specific message
-exports.oldfunction = deprecate.function(function () {
-  // all calls to function are deprecated
-}, 'oldfunction')
+```bash
+git clone https://github.com/expressjs/express.git --depth 1 && cd express
 ```
 
-### Conditionally deprecating a function call
+  Then install the dependencies:
 
-This will display a deprecated message about "weirdfunction" being deprecated
-from "my-module" on STDERR when called with less than 2 arguments.
-
-```js
-var deprecate = require('depd')('my-cool-module')
-
-exports.weirdfunction = function () {
-  if (arguments.length < 2) {
-    // calls with 0 or 1 args are deprecated
-    deprecate('weirdfunction args < 2')
-  }
-}
+```bash
+npm install
 ```
 
-When calling `deprecate` as a function, the warning is counted per call site
-within your own module, so you can display different deprecations depending
-on different situations and the users will still get all the warnings:
+  Then run whichever example you want:
 
-```js
-var deprecate = require('depd')('my-cool-module')
-
-exports.weirdfunction = function () {
-  if (arguments.length < 2) {
-    // calls with 0 or 1 args are deprecated
-    deprecate('weirdfunction args < 2')
-  } else if (typeof arguments[0] !== 'string') {
-    // calls with non-string first argument are deprecated
-    deprecate('weirdfunction non-string first arg')
-  }
-}
+```bash
+node examples/content-negotiation
 ```
 
-### Deprecating property access
+## Contributing
 
-This will display a deprecated message about "oldprop" being deprecated
-from "my-module" on STDERR when accessed. A deprecation will be displayed
-when setting the value and when getting the value.
+  [![Linux Build][github-actions-ci-image]][github-actions-ci-url]
+  [![Test Coverage][coveralls-image]][coveralls-url]
 
-```js
-var deprecate = require('depd')('my-cool-module')
+The Express.js project welcomes all constructive contributions. Contributions take many forms,
+from code for bug fixes and enhancements, to additions and fixes to documentation, additional
+tests, triaging incoming pull requests and issues, and more!
 
-exports.oldprop = 'something'
+See the [Contributing Guide](Contributing.md) for more technical details on contributing.
 
-// message automatically derives from property name
-deprecate.property(exports, 'oldprop')
+### Security Issues
 
-// explicit message
-deprecate.property(exports, 'oldprop', 'oldprop >= 0.10')
+If you discover a security vulnerability in Express, please see [Security Policies and Procedures](Security.md).
+
+### Running Tests
+
+To run the test suite, first install the dependencies:
+
+```bash
+npm install
 ```
+
+Then run `npm test`:
+
+```bash
+npm test
+```
+
+## People
+
+The original author of Express is [TJ Holowaychuk](https://github.com/tj)
+
+[List of all contributors](https://github.com/expressjs/express/graphs/contributors)
+
+### TC (Technical Committee)
+
+* [UlisesGascon](https://github.com/UlisesGascon) - **Ulises Gascón** (he/him)
+* [jonchurch](https://github.com/jonchurch) - **Jon Church**
+* [wesleytodd](https://github.com/wesleytodd) - **Wes Todd**
+* [LinusU](https://github.com/LinusU) - **Linus Unnebäck**
+* [blakeembrey](https://github.com/blakeembrey) - **Blake Embrey**
+* [sheplu](https://github.com/sheplu) - **Jean Burellier**
+* [crandmck](https://github.com/crandmck) - **Rand McKinney**
+* [ctcpip](https://github.com/ctcpip) - **Chris de Almeida**
+
+<details>
+<summary>TC emeriti members</summary>
+
+#### TC emeriti members
+
+  * [dougwilson](https://github.com/dougwilson) - **Douglas Wilson**
+  * [hacksparrow](https://github.com/hacksparrow) - **Hage Yaapa**
+  * [jonathanong](https://github.com/jonathanong) - **jongleberry**
+  * [niftylettuce](https://github.com/niftylettuce) - **niftylettuce**
+  * [troygoode](https://github.com/troygoode) - **Troy Goode**
+</details>
+
+
+### Triagers
+
+* [aravindvnair99](https://github.com/aravindvnair99) - **Aravind Nair**
+* [bjohansebas](https://github.com/bjohansebas) - **Sebastian Beltran**
+* [carpasse](https://github.com/carpasse) - **Carlos Serrano**
+* [CBID2](https://github.com/CBID2) - **Christine Belzie**
+* [dpopp07](https://github.com/dpopp07) - **Dustin Popp**
+* [UlisesGascon](https://github.com/UlisesGascon) - **Ulises Gascón** (he/him)
+* [3imed-jaberi](https://github.com/3imed-jaberi) - **Imed Jaberi**
+* [IamLizu](https://github.com/IamLizu) - **S M Mahmudul Hasan** (he/him)
+* [Phillip9587](https://github.com/Phillip9587) - **Phillip Barta**
+* [Sushmeet](https://github.com/Sushmeet) - **Sushmeet Sunger**
+* [rxmarbles](https://github.com/rxmarbles) **Rick Markins** (He/him)
+
+<details>
+<summary>Triagers emeriti members</summary>
+
+#### Emeritus Triagers
+
+  * [AuggieH](https://github.com/AuggieH) - **Auggie Hudak**
+  * [G-Rath](https://github.com/G-Rath) - **Gareth Jones**
+  * [MohammadXroid](https://github.com/MohammadXroid) - **Mohammad Ayashi**
+  * [NawafSwe](https://github.com/NawafSwe) - **Nawaf Alsharqi**
+  * [NotMoni](https://github.com/NotMoni) - **Moni**
+  * [VigneshMurugan](https://github.com/VigneshMurugan) - **Vignesh Murugan**
+  * [davidmashe](https://github.com/davidmashe) - **David Ashe**
+  * [digitaIfabric](https://github.com/digitaIfabric) - **David**
+  * [e-l-i-s-e](https://github.com/e-l-i-s-e) - **Elise Bonner**
+  * [fed135](https://github.com/fed135) - **Frederic Charette**
+  * [firmanJS](https://github.com/firmanJS) - **Firman Abdul Hakim**
+  * [getspooky](https://github.com/getspooky) - **Yasser Ameur**
+  * [ghinks](https://github.com/ghinks) - **Glenn**
+  * [ghousemohamed](https://github.com/ghousemohamed) - **Ghouse Mohamed**
+  * [gireeshpunathil](https://github.com/gireeshpunathil) - **Gireesh Punathil**
+  * [jake32321](https://github.com/jake32321) - **Jake Reed**
+  * [jonchurch](https://github.com/jonchurch) - **Jon Church**
+  * [lekanikotun](https://github.com/lekanikotun) - **Troy Goode**
+  * [marsonya](https://github.com/marsonya) - **Lekan Ikotun**
+  * [mastermatt](https://github.com/mastermatt) - **Matt R. Wilson**
+  * [maxakuru](https://github.com/maxakuru) - **Max Edell**
+  * [mlrawlings](https://github.com/mlrawlings) - **Michael Rawlings**
+  * [rodion-arr](https://github.com/rodion-arr) - **Rodion Abdurakhimov**
+  * [sheplu](https://github.com/sheplu) - **Jean Burellier**
+  * [tarunyadav1](https://github.com/tarunyadav1) - **Tarun yadav**
+  * [tunniclm](https://github.com/tunniclm) - **Mike Tunnicliffe**
+  * [enyoghasim](https://github.com/enyoghasim) - **David Enyoghasim**
+  * [0ss](https://github.com/0ss) - **Salah**
+  * [import-brain](https://github.com/import-brain) - **Eric Cheng** (he/him)
+  * [dakshkhetan](https://github.com/dakshkhetan) - **Daksh Khetan** (he/him)
+  * [lucasraziel](https://github.com/lucasraziel) - **Lucas Soares Do Rego**
+  * [mertcanaltin](https://github.com/mertcanaltin) - **Mert Can Altin**
+  
+</details>
+
 
 ## License
 
-[MIT](LICENSE)
+  [MIT](LICENSE)
 
-[appveyor-image]: https://badgen.net/appveyor/ci/dougwilson/nodejs-depd/master?label=windows
-[appveyor-url]: https://ci.appveyor.com/project/dougwilson/nodejs-depd
-[coveralls-image]: https://badgen.net/coveralls/c/github/dougwilson/nodejs-depd/master
-[coveralls-url]: https://coveralls.io/r/dougwilson/nodejs-depd?branch=master
-[node-image]: https://badgen.net/npm/node/depd
-[node-url]: https://nodejs.org/en/download/
-[npm-downloads-image]: https://badgen.net/npm/dm/depd
-[npm-url]: https://npmjs.org/package/depd
-[npm-version-image]: https://badgen.net/npm/v/depd
-[travis-image]: https://badgen.net/travis/dougwilson/nodejs-depd/master?label=linux
-[travis-url]: https://travis-ci.org/dougwilson/nodejs-depd
+[coveralls-image]: https://badgen.net/coveralls/c/github/expressjs/express/master
+[coveralls-url]: https://coveralls.io/r/expressjs/express?branch=master
+[github-actions-ci-image]: https://badgen.net/github/checks/expressjs/express/master?label=CI
+[github-actions-ci-url]: https://github.com/expressjs/express/actions/workflows/ci.yml
+[npm-downloads-image]: https://badgen.net/npm/dm/express
+[npm-downloads-url]: https://npmcharts.com/compare/express?minimal=true
+[npm-url]: https://npmjs.org/package/express
+[npm-version-image]: https://badgen.net/npm/v/express
+[ossf-scorecard-badge]: https://api.scorecard.dev/projects/github.com/expressjs/express/badge
+[ossf-scorecard-visualizer]: https://ossf.github.io/scorecard-visualizer/#/projects/github.com/expressjs/express
+[Code of Conduct]: https://github.com/expressjs/express/blob/master/Code-Of-Conduct.md
