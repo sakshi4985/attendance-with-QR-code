@@ -1,54 +1,33 @@
-# import-fresh
+<a href="https://promisesaplus.com/"><img src="https://promisesaplus.com/assets/logo-small.png" align="right" /></a>
 
-> Import a module while bypassing the [cache](https://nodejs.org/api/modules.html#modules_caching)
+# is-promise
 
-Useful for testing purposes when you need to freshly import a module.
+  Test whether an object looks like a promises-a+ promise
 
-## ESM
+ [![Build Status](https://img.shields.io/travis/then/is-promise/master.svg)](https://travis-ci.org/then/is-promise)
+ [![Dependency Status](https://img.shields.io/david/then/is-promise.svg)](https://david-dm.org/then/is-promise)
+ [![NPM version](https://img.shields.io/npm/v/is-promise.svg)](https://www.npmjs.org/package/is-promise)
 
-For ESM, you can use this snippet:
 
-```js
-const importFresh = moduleName => import(`${moduleName}?${Date.now()}`);
 
-const {default: foo} = await importFresh('foo');
+## Installation
+
+    $ npm install is-promise
+
+You can also use it client side via npm.
+
+## API
+
+```typescript
+import isPromise from 'is-promise';
+
+isPromise(Promise.resolve());//=>true
+isPromise({then:function () {...}});//=>true
+isPromise(null);//=>false
+isPromise({});//=>false
+isPromise({then: true})//=>false
 ```
 
-**This snippet causes a memory leak, so only use it for short-lived tests.**
+## License
 
-## Install
-
-```sh
-npm install import-fresh
-```
-
-## Usage
-
-```js
-// foo.js
-let i = 0;
-module.exports = () => ++i;
-```
-
-```js
-const importFresh = require('import-fresh');
-
-require('./foo')();
-//=> 1
-
-require('./foo')();
-//=> 2
-
-importFresh('./foo')();
-//=> 1
-
-importFresh('./foo')();
-//=> 1
-```
-
-## Related
-
-- [clear-module](https://github.com/sindresorhus/clear-module) - Clear a module from the import cache
-- [import-from](https://github.com/sindresorhus/import-from) - Import a module from a given path
-- [import-cwd](https://github.com/sindresorhus/import-cwd) - Import a module from the current working directory
-- [import-lazy](https://github.com/sindresorhus/import-lazy) - Import modules lazily
+  MIT

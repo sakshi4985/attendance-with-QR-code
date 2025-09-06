@@ -1,5 +1,3 @@
-'use strict';
-
 var test = require('tape');
 var stringify = require('../');
 
@@ -15,9 +13,9 @@ test('cyclic (default)', function (t) {
     var two = { a: 2, one: one };
     one.two = two;
     try {
-        stringify(one);
+    	stringify(one);
     } catch (ex) {
-        t.equal(ex.toString(), 'TypeError: Converting circular structure to JSON');
+    	t.equal(ex.toString(), 'TypeError: Converting circular structure to JSON');
     }
 });
 
@@ -38,7 +36,7 @@ test('repeated non-cyclic value', function(t) {
 
 test('acyclic but with reused obj-property pointers', function (t) {
     t.plan(1);
-    var x = { a: 1 };
-    var y = { b: x, c: x };
+    var x = { a: 1 }
+    var y = { b: x, c: x }
     t.equal(stringify(y), '{"b":{"a":1},"c":{"a":1}}');
 });
