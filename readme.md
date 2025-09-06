@@ -1,33 +1,122 @@
-<a href="https://promisesaplus.com/"><img src="https://promisesaplus.com/assets/logo-small.png" align="right" /></a>
+# locate-path [![Build Status](https://travis-ci.org/sindresorhus/locate-path.svg?branch=master)](https://travis-ci.org/sindresorhus/locate-path)
 
-# is-promise
-
-  Test whether an object looks like a promises-a+ promise
-
- [![Build Status](https://img.shields.io/travis/then/is-promise/master.svg)](https://travis-ci.org/then/is-promise)
- [![Dependency Status](https://img.shields.io/david/then/is-promise.svg)](https://david-dm.org/then/is-promise)
- [![NPM version](https://img.shields.io/npm/v/is-promise.svg)](https://www.npmjs.org/package/is-promise)
+> Get the first path that exists on disk of multiple paths
 
 
+## Install
 
-## Installation
+```
+$ npm install locate-path
+```
 
-    $ npm install is-promise
 
-You can also use it client side via npm.
+## Usage
+
+Here we find the first file that exists on disk, in array order.
+
+```js
+const locatePath = require('locate-path');
+
+const files = [
+	'unicorn.png',
+	'rainbow.png', // Only this one actually exists on disk
+	'pony.png'
+];
+
+(async () => {
+	console(await locatePath(files));
+	//=> 'rainbow'
+})();
+```
+
 
 ## API
 
-```typescript
-import isPromise from 'is-promise';
+### locatePath(paths, [options])
 
-isPromise(Promise.resolve());//=>true
-isPromise({then:function () {...}});//=>true
-isPromise(null);//=>false
-isPromise({});//=>false
-isPromise({then: true})//=>false
-```
+Returns a `Promise<string>` for the first path that exists or `undefined` if none exists.
+
+#### paths
+
+Type: `Iterable<string>`
+
+Paths to check.
+
+#### options
+
+Type: `Object`
+
+##### concurrency
+
+Type: `number`<br>
+Default: `Infinity`<br>
+Minimum: `1`
+
+Number of concurrently pending promises.
+
+##### preserveOrder
+
+Type: `boolean`<br>
+Default: `true`
+
+Preserve `paths` order when searching.
+
+Disable this to improve performance if you don't care about the order.
+
+##### cwd
+
+Type: `string`<br>
+Default: `process.cwd()`
+
+Current working directory.
+
+##### type
+
+Type: `string`<br>
+Default: `file`<br>
+Values: `file` `directory`
+
+The type of paths that can match.
+
+##### allowSymlinks
+
+Type: `boolean`<br>
+Default: `true`
+
+Allow symbolic links to match if they point to the chosen path type.
+
+### locatePath.sync(paths, [options])
+
+Returns the first path that exists or `undefined` if none exists.
+
+#### paths
+
+Type: `Iterable<string>`
+
+Paths to check.
+
+#### options
+
+Type: `Object`
+
+##### cwd
+
+Same as above.
+
+##### type
+
+Same as above.
+
+##### allowSymlinks
+
+Same as above.
+
+
+## Related
+
+- [path-exists](https://github.com/sindresorhus/path-exists) - Check if a path exists
+
 
 ## License
 
-  MIT
+MIT © [Sindre Sorhus](https://sindresorhus.com)

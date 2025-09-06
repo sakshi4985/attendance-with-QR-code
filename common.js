@@ -1,46 +1,59 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.isInSubnet = isInSubnet;
-exports.isCorrect = isCorrect;
-exports.numberToPaddedHex = numberToPaddedHex;
-exports.stringToPaddedHex = stringToPaddedHex;
-exports.testBit = testBit;
-function isInSubnet(address) {
-    if (this.subnetMask < address.subnetMask) {
-        return false;
+'use strict';
+
+
+function isNothing(subject) {
+  return (typeof subject === 'undefined') || (subject === null);
+}
+
+
+function isObject(subject) {
+  return (typeof subject === 'object') && (subject !== null);
+}
+
+
+function toArray(sequence) {
+  if (Array.isArray(sequence)) return sequence;
+  else if (isNothing(sequence)) return [];
+
+  return [ sequence ];
+}
+
+
+function extend(target, source) {
+  var index, length, key, sourceKeys;
+
+  if (source) {
+    sourceKeys = Object.keys(source);
+
+    for (index = 0, length = sourceKeys.length; index < length; index += 1) {
+      key = sourceKeys[index];
+      target[key] = source[key];
     }
-    if (this.mask(address.subnetMask) === address.mask()) {
-        return true;
-    }
-    return false;
+  }
+
+  return target;
 }
-function isCorrect(defaultBits) {
-    return function () {
-        if (this.addressMinusSuffix !== this.correctForm()) {
-            return false;
-        }
-        if (this.subnetMask === defaultBits && !this.parsedSubnet) {
-            return true;
-        }
-        return this.parsedSubnet === String(this.subnetMask);
-    };
+
+
+function repeat(string, count) {
+  var result = '', cycle;
+
+  for (cycle = 0; cycle < count; cycle += 1) {
+    result += string;
+  }
+
+  return result;
 }
-function numberToPaddedHex(number) {
-    return number.toString(16).padStart(2, '0');
+
+
+function isNegativeZero(number) {
+  return (number === 0) && (Number.NEGATIVE_INFINITY === 1 / number);
 }
-function stringToPaddedHex(numberString) {
-    return numberToPaddedHex(parseInt(numberString, 10));
-}
-/**
- * @param binaryValue Binary representation of a value (e.g. `10`)
- * @param position Byte position, where 0 is the least significant bit
- */
-function testBit(binaryValue, position) {
-    const { length } = binaryValue;
-    if (position > length) {
-        return false;
-    }
-    const positionInString = length - position;
-    return binaryValue.substring(positionInString, positionInString + 1) === '1';
-}
-//# sourceMappingURL=common.js.map
+
+
+module.exports.isNothing      = isNothing;
+module.exports.isObject       = isObject;
+module.exports.toArray        = toArray;
+module.exports.repeat         = repeat;
+module.exports.isNegativeZero = isNegativeZero;
+module.exports.extend         = extend;

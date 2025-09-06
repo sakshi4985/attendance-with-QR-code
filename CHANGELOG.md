@@ -1,974 +1,823 @@
 # Changelog
 
-## 8.1.0 - 2025-03-17
+<a name="2.6.0"></a>
+## 2.6.0 (2024-03-04)
 
-### Changed
+* feat: add TypeScript types
 
-- `Content-Security-Policy` gives a better error when a directive value, like `self`, should be quoted. See [#482](https://github.com/helmetjs/helmet/issues/482)
+<a name="2.5.1"></a>
+## 2.5.1 (2023-01-06)
 
-## 8.0.0 - 2024-09-28
+* fix: avoid passing final callback to pre hook, because calling the callback can mess up hook execution #36 Automattic/mongoose#12836
 
-### Changed
+<a name="2.5.0"></a>
+## 2.5.0 (2022-12-01)
 
-- **Breaking:** `Strict-Transport-Security` now has a max-age of 365 days, up from 180
-- **Breaking:** `Content-Security-Policy` middleware now throws an error if a directive should have quotes but does not, such as `self` instead of `'self'`. See [#454](https://github.com/helmetjs/helmet/issues/454)
-- **Breaking:** `Content-Security-Policy`'s `getDefaultDirectives` now returns a deep copy. This only affects users who were mutating the result
-- **Breaking:** `Strict-Transport-Security` now throws an error when "includeSubDomains" option is misspelled. This was previously a warning
+* feat: add errorHandler option to `post()` #34
 
-### Removed
+<a name="2.4.0"></a>
+## 2.4.0 (2022-06-13)
 
-- **Breaking:** Drop support for Node 16 and 17. Node 18+ is now required
+* feat: add `overwriteResult()` and `skipWrappedFunction()` for more advanced control flow
 
-## 7.2.0 - 2024-09-28
+<a name="2.3.4"></a>
+## 2.3.4 (2022-02-10)
 
-### Changed
+* perf: various performance improvements #27 #24 #23 #22 #21 #20
 
-- `Content-Security-Policy` middleware now warns if a directive should have quotes but does not, such as `self` instead of `'self'`. This will be an error in future versions. See [#454](https://github.com/helmetjs/helmet/issues/454)
+<a name="2.3.3"></a>
+## 2.3.3 (2021-12-26)
 
-## 7.1.0 - 2023-11-07
+* fix: handle sync errors in `wrap()`
 
-### Added
+<a name="2.3.2"></a>
+## 2.3.2 (2020-12-08)
 
-- `helmet.crossOriginEmbedderPolicy` now supports the `unsafe-none` directive. See [#477](https://github.com/helmetjs/helmet/pull/447)
+* fix: handle sync errors in pre hooks if there are multiple hooks
 
-## 7.0.0 - 2023-05-06
+<a name="2.3.0"></a>
+## 2.3.0 (2018-09-24)
 
-### Changed
+* chore(release): 2.2.3 ([c8f2695](https://github.com/vkarpov15/kareem/commit/c8f2695))
+* chore(release): 2.2.4 ([a377a4f](https://github.com/vkarpov15/kareem/commit/a377a4f))
+* chore(release): 2.2.5 ([5a495e3](https://github.com/vkarpov15/kareem/commit/5a495e3))
+* fix(filter): copy async pres correctly with `filter()` ([1b1ed8a](https://github.com/vkarpov15/kareem/commit/1b1ed8a)), closes [Automattic/mongoose#3054](https://github.com/Automattic/mongoose/issues/3054)
+* feat: add filter() function ([1f641f4](https://github.com/vkarpov15/kareem/commit/1f641f4))
+* feat: support storing options on pre and post hooks ([59220b9](https://github.com/vkarpov15/kareem/commit/59220b9))
 
-- **Breaking:** `Cross-Origin-Embedder-Policy` middleware is now disabled by default. See [#411](https://github.com/helmetjs/helmet/issues/411)
 
-### Removed
 
-- **Breaking:** Drop support for Node 14 and 15. Node 16+ is now required
-- **Breaking:** `Expect-CT` is no longer part of Helmet. If you still need it, you can use the [`expect-ct` package](https://www.npmjs.com/package/expect-ct). See [#378](https://github.com/helmetjs/helmet/issues/378)
+<a name="2.2.3"></a>
+## <small>2.2.3 (2018-09-10)</small>
 
-## 6.2.0 - 2023-05-06
+* chore: release 2.2.3 ([af653a3](https://github.com/vkarpov15/kareem/commit/af653a3))
 
-- Expose header names (e.g., `strictTransportSecurity` for the `Strict-Transport-Security` header, instead of `hsts`)
-- Rework documentation
 
-## 6.1.5 - 2023-04-11
 
-### Fixed
+<a name="2.2.2"></a>
+## <small>2.2.2 (2018-09-10)</small>
 
-- Fixed yet another issue with TypeScript exports. See [#420](https://github.com/helmetjs/helmet/pull/418)
+* chore: release 2.2.2 ([3f0144d](https://github.com/vkarpov15/kareem/commit/3f0144d))
+* fix: allow merge() to not clone ([e628d65](https://github.com/vkarpov15/kareem/commit/e628d65))
 
-## 6.1.4 - 2023-04-10
 
-### Fixed
 
-- Fix another issue with TypeScript default exports. See [#418](https://github.com/helmetjs/helmet/pull/418)
+<a name="2.2.1"></a>
+## <small>2.2.1 (2018-06-05)</small>
 
-## 6.1.3 - 2023-04-10
+* chore: release 2.2.1 ([4625a64](https://github.com/vkarpov15/kareem/commit/4625a64))
+* chore: remove lockfile from git ([7f3e4e6](https://github.com/vkarpov15/kareem/commit/7f3e4e6))
+* fix: handle numAsync correctly when merging ([fef8e7e](https://github.com/vkarpov15/kareem/commit/fef8e7e))
+* test: repro issue with not copying numAsync ([952d9db](https://github.com/vkarpov15/kareem/commit/952d9db))
 
-### Fixed
 
-- Fix issue with TypeScript default exports. See [#417](https://github.com/helmetjs/helmet/pull/417)
 
-## 6.1.2 - 2023-04-09
+<a name="2.2.0"></a>
+## 2.2.0 (2018-06-05)
 
-### Fixed
+* chore: release 2.2.0 ([ff9ad03](https://github.com/vkarpov15/kareem/commit/ff9ad03))
+* fix: use maps instead of objects for _pres and _posts so `toString()` doesn't get reported as having ([55df303](https://github.com/vkarpov15/kareem/commit/55df303)), closes [Automattic/mongoose#6538](https://github.com/Automattic/mongoose/issues/6538)
 
-- Retored `main` to package to help with some build tools
 
-## 6.1.1 - 2023-04-08
 
-### Fixed
+<a name="2.1.0"></a>
+## 2.1.0 (2018-05-16)
 
-- Fixed missing package metadata
+* chore: release 2.1.0 ([ba5f1bc](https://github.com/vkarpov15/kareem/commit/ba5f1bc))
+* feat: add option to check wrapped function return value for promises ([c9d7dd1](https://github.com/vkarpov15/kareem/commit/c9d7dd1))
+* refactor: use const in wrap() ([0fc21f9](https://github.com/vkarpov15/kareem/commit/0fc21f9))
 
-## 6.1.0 - 2023-04-08
 
-### Changed
 
-- Improve support for various TypeScript setups, including "nodenext". See [#405](https://github.com/helmetjs/helmet/pull/405)
+<a name="2.0.7"></a>
+## <small>2.0.7 (2018-04-28)</small>
 
-## 6.0.1 - 2022-11-29
+* chore: release 2.0.7 ([0bf91e6](https://github.com/vkarpov15/kareem/commit/0bf91e6))
+* feat: add `hasHooks()` ([225f18d](https://github.com/vkarpov15/kareem/commit/225f18d)), closes [Automattic/mongoose#6385](https://github.com/Automattic/mongoose/issues/6385)
 
-### Fixed
 
-- `crossOriginEmbedderPolicy` did not accept options at the top level. See [#390](https://github.com/helmetjs/helmet/issues/390)
 
-## 6.0.0 - 2022-08-26
+<a name="2.0.6"></a>
+## <small>2.0.6 (2018-03-22)</small>
 
-### Changed
+* chore: release 2.0.6 ([f3d406b](https://github.com/vkarpov15/kareem/commit/f3d406b))
+* fix(wrap): ensure fast path still wraps function in `nextTick()` for chaining ([7000494](https://github.com/vkarpov15/kareem/commit/7000494)), closes [Automattic/mongoose#6250](https://github.com/Automattic/mongoose/issues/6250) [dsanel/mongoose-delete#36](https://github.com/dsanel/mongoose-delete/issues/36)
 
-- **Breaking:** `helmet.contentSecurityPolicy` no longer sets `block-all-mixed-content` directive by default
-- **Breaking:** `helmet.expectCt` is no longer set by default. It can, however, be explicitly enabled. It will be removed in Helmet 7. See [#310](https://github.com/helmetjs/helmet/issues/310)
-- **Breaking:** Increase TypeScript strictness around some arguments. Only affects TypeScript users, and may not require any code changes. See [#369](https://github.com/helmetjs/helmet/issues/369)
-- `helmet.frameguard` no longer offers a specific error when trying to use `ALLOW-FROM`; it just says that it is unsupported. Only the error message has changed
 
-### Removed
 
-- **Breaking:** Dropped support for Node 12 and 13. Node 14+ is now required
+<a name="2.0.5"></a>
+## <small>2.0.5 (2018-02-22)</small>
 
-## 5.1.1 - 2022-07-23
+* chore: release 2.0.5 ([3286612](https://github.com/vkarpov15/kareem/commit/3286612))
+* perf(createWrapper): don't create wrapper if there are no hooks ([5afc5b9](https://github.com/vkarpov15/kareem/commit/5afc5b9)), closes [Automattic/mongoose#6126](https://github.com/Automattic/mongoose/issues/6126)
 
-### Changed
 
-- Fix TypeScript bug with some TypeScript configurations. See [#375](https://github.com/helmetjs/helmet/pull/375) and [#359](https://github.com/helmetjs/helmet/issues/359)
 
-## 5.1.0 - 2022-05-17
+<a name="2.0.4"></a>
+## <small>2.0.4 (2018-02-08)</small>
 
-### Added
+* chore: release 2.0.4 ([2ab0293](https://github.com/vkarpov15/kareem/commit/2ab0293))
 
-- `Cross-Origin-Embedder-Policy`: support `credentialless` policy. See [#365](https://github.com/helmetjs/helmet/pull/365)
-- Documented how to set both `Content-Security-Policy` and `Content-Security-Policy-Report-Only`
 
-### Changed
 
-- Cleaned up some documentation around `Origin-Agent-Cluster`
+<a name="2.0.3"></a>
+## <small>2.0.3 (2018-02-01)</small>
 
-## 5.0.2 - 2022-01-22
+* chore: release 2.0.3 ([3c1abe5](https://github.com/vkarpov15/kareem/commit/3c1abe5))
+* fix: use process.nextTick() re: Automattic/mongoose#6074 ([e5bfe33](https://github.com/vkarpov15/kareem/commit/e5bfe33)), closes [Automattic/mongoose#6074](https://github.com/Automattic/mongoose/issues/6074)
 
-### Changed
 
-- Improve imports for CommonJS and ECMAScript modules. See [#345](https://github.com/helmetjs/helmet/pull/345)
-- Fixed some documentation
 
-## 5.0.1 - 2022-01-03
+<a name="2.0.2"></a>
+## <small>2.0.2 (2018-01-24)</small>
 
-### Changed
+* chore: fix license ([a9d755c](https://github.com/vkarpov15/kareem/commit/a9d755c)), closes [#10](https://github.com/vkarpov15/kareem/issues/10)
+* chore: release 2.0.2 ([fe87ab6](https://github.com/vkarpov15/kareem/commit/fe87ab6))
 
-- Fixed some documentation
 
-### Removed
 
-- Removed some unused internal code
+<a name="2.0.1"></a>
+## <small>2.0.1 (2018-01-09)</small>
 
-## 5.0.0 - 2022-01-02
+* chore: release 2.0.1 with lockfile bump ([09c44fb](https://github.com/vkarpov15/kareem/commit/09c44fb))
 
-### Added
 
-- ECMAScript module imports (i.e., `import helmet from "helmet"` and `import { frameguard } from "helmet"`). See [#320](https://github.com/helmetjs/helmet/issues/320)
 
-### Changed
+<a name="2.0.0"></a>
+## 2.0.0 (2018-01-09)
 
-- **Breaking:** `helmet.contentSecurityPolicy`: `useDefaults` option now defaults to `true`
-- **Breaking:** `helmet.contentSecurityPolicy`: `form-action` directive is now set to `'self'` by default
-- **Breaking:** `helmet.crossOriginEmbedderPolicy` is enabled by default
-- **Breaking:** `helmet.crossOriginOpenerPolicy` is enabled by default
-- **Breaking:** `helmet.crossOriginResourcePolicy` is enabled by default
-- **Breaking:** `helmet.originAgentCluster` is enabled by default
-- `helmet.frameguard`: add TypeScript editor autocomplete. See [#322](https://github.com/helmetjs/helmet/pull/322)
-- Top-level `helmet()` function is slightly faster
+* chore: bump marked re: security ([cc564a9](https://github.com/vkarpov15/kareem/commit/cc564a9))
+* chore: release 2.0.0 ([f511d1c](https://github.com/vkarpov15/kareem/commit/f511d1c))
 
-### Removed
 
-- **Breaking:** Drop support for Node 10 and 11. Node 12+ is now required
 
-## 4.6.0 - 2021-05-01
+<a name="2.0.0-rc5"></a>
+## 2.0.0-rc5 (2017-12-23)
 
-### Added
+* chore: fix build on node 4+5 ([6dac5a4](https://github.com/vkarpov15/kareem/commit/6dac5a4))
+* chore: fix built on node 4 + 5 again ([434ef0a](https://github.com/vkarpov15/kareem/commit/434ef0a))
+* chore: release 2.0.0-rc5 ([25a32ee](https://github.com/vkarpov15/kareem/commit/25a32ee))
 
-- `helmet.contentSecurityPolicy`: the `useDefaults` option, defaulting to `false`, lets you selectively override defaults more easily
-- Explicitly define TypeScript types in `package.json`. See [#303](https://github.com/helmetjs/helmet/pull/303)
 
-## 4.5.0 - 2021-04-17
 
-### Added
+<a name="2.0.0-rc4"></a>
+## 2.0.0-rc4 (2017-12-22)
 
-- `helmet.crossOriginEmbedderPolicy`: a new middleware for the `Cross-Origin-Embedder-Policy` header, disabled by default
-- `helmet.crossOriginOpenerPolicy`: a new middleware for the `Cross-Origin-Opener-Policy` header, disabled by default
-- `helmet.crossOriginResourcePolicy`: a new middleware for the `Cross-Origin-Resource-Policy` header, disabled by default
+* chore: release 2.0.0-rc4 ([49fc083](https://github.com/vkarpov15/kareem/commit/49fc083))
+* BREAKING CHANGE: deduplicate when merging hooks re: Automattic/mongoose#2945 ([d458573](https://github.com/vkarpov15/kareem/commit/d458573)), closes [Automattic/mongoose#2945](https://github.com/Automattic/mongoose/issues/2945)
 
-### Changed
 
-- `true` enables a middleware with default options. Previously, this would fail with an error if the middleware was already enabled by default.
-- Log a warning when passing options to `originAgentCluster` at the top level
 
-### Fixed
+<a name="2.0.0-rc3"></a>
+## 2.0.0-rc3 (2017-12-22)
 
-- Incorrect documentation
+* chore: release 2.0.0-rc3 ([adaaa00](https://github.com/vkarpov15/kareem/commit/adaaa00))
+* feat: support returning promises from middleware functions ([05b4480](https://github.com/vkarpov15/kareem/commit/05b4480)), closes [Automattic/mongoose#3779](https://github.com/Automattic/mongoose/issues/3779)
 
-## 4.4.1 - 2021-01-18
 
-### Changed
 
-- Shrink the published package by about 2.5 kB
+<a name="2.0.0-rc2"></a>
+## 2.0.0-rc2 (2017-12-21)
 
-## 4.4.0 - 2021-01-17
+* chore: release 2.0.0-rc2 ([76325fa](https://github.com/vkarpov15/kareem/commit/76325fa))
+* fix: ensure next() and done() run in next tick ([6c20684](https://github.com/vkarpov15/kareem/commit/6c20684))
 
-### Added
 
-- `helmet.originAgentCluster`: a new middleware for the `Origin-Agent-Cluster` header, disabled by default
 
-## 4.3.1 - 2020-12-27
+<a name="2.0.0-rc1"></a>
+## 2.0.0-rc1 (2017-12-21)
 
-### Fixed
+* chore: improve test coverage re: Automattic/mongoose#3232 ([7b45cf0](https://github.com/vkarpov15/kareem/commit/7b45cf0)), closes [Automattic/mongoose#3232](https://github.com/Automattic/mongoose/issues/3232)
+* chore: release 2.0.0-rc1 ([9b83f52](https://github.com/vkarpov15/kareem/commit/9b83f52))
+* BREAKING CHANGE: report sync exceptions as errors, only allow calling next() and done() once ([674adcc](https://github.com/vkarpov15/kareem/commit/674adcc)), closes [Automattic/mongoose#3483](https://github.com/Automattic/mongoose/issues/3483)
 
-- `helmet.contentSecurityPolicy`: broken TypeScript types. See [#283](https://github.com/helmetjs/helmet/issues/283)
 
-## 4.3.0 - 2020-12-27
 
-### Added
+<a name="2.0.0-rc0"></a>
+## 2.0.0-rc0 (2017-12-17)
 
-- `helmet.contentSecurityPolicy`: setting the `default-src` to `helmet.contentSecurityPolicy.dangerouslyDisableDefaultSrc` disables it
+* chore: release 2.0.0-rc0 ([16b44b5](https://github.com/vkarpov15/kareem/commit/16b44b5))
+* BREAKING CHANGE: drop support for node < 4 ([9cbb8c7](https://github.com/vkarpov15/kareem/commit/9cbb8c7))
+* BREAKING CHANGE: remove useLegacyPost and add several new features ([6dd8531](https://github.com/vkarpov15/kareem/commit/6dd8531)), closes [Automattic/mongoose#3232](https://github.com/Automattic/mongoose/issues/3232)
 
-### Changed
 
-- `helmet.frameguard`: slightly improved error messages for non-strings
 
-## 4.2.0 - 2020-11-01
+<a name="1.5.0"></a>
+## 1.5.0 (2017-07-20)
 
-### Added
+* chore: release 1.5.0 ([9c491a0](https://github.com/vkarpov15/kareem/commit/9c491a0))
+* fix: improve post error handlers results ([9928dd5](https://github.com/vkarpov15/kareem/commit/9928dd5)), closes [Automattic/mongoose#5466](https://github.com/Automattic/mongoose/issues/5466)
 
-- `helmet.contentSecurityPolicy`: get the default directives with `contentSecurityPolicy.getDefaultDirectives()`
 
-### Changed
 
-- `helmet()` now supports objects that don't have `Object.prototype` in their chain, such as `Object.create(null)`, as options
-- `helmet.expectCt`: `max-age` is now first. See [#264](https://github.com/helmetjs/helmet/pull/264)
+<a name="1.4.2"></a>
+## <small>1.4.2 (2017-07-06)</small>
 
-## 4.1.1 - 2020-09-10
+* chore: release 1.4.2 ([8d14ac5](https://github.com/vkarpov15/kareem/commit/8d14ac5))
+* fix: correct args re: Automattic/mongoose#5405 ([3f28ae6](https://github.com/vkarpov15/kareem/commit/3f28ae6)), closes [Automattic/mongoose#5405](https://github.com/Automattic/mongoose/issues/5405)
 
-### Changed
 
-- Fixed a few errors in the README
 
-## 4.1.0 - 2020-08-15
+<a name="1.4.1"></a>
+## <small>1.4.1 (2017-04-25)</small>
 
-### Added
+* chore: release 1.4.1 ([5ecf0c2](https://github.com/vkarpov15/kareem/commit/5ecf0c2))
+* fix: handle numAsyncPres with clone() ([c72e857](https://github.com/vkarpov15/kareem/commit/c72e857)), closes [#8](https://github.com/vkarpov15/kareem/issues/8)
+* test: repro #8 ([9b4d6b2](https://github.com/vkarpov15/kareem/commit/9b4d6b2)), closes [#8](https://github.com/vkarpov15/kareem/issues/8)
 
-- `helmet.contentSecurityPolicy`:
-  - Directive values can now include functions, as they could in Helmet 3. See [#243](https://github.com/helmetjs/helmet/issues/243)
 
-### Changed
 
-- Helmet should now play more nicely with TypeScript
+<a name="1.4.0"></a>
+## 1.4.0 (2017-04-19)
 
-### Removed
+* chore: release 1.4.0 ([101c5f5](https://github.com/vkarpov15/kareem/commit/101c5f5))
+* feat: add merge() function ([285325e](https://github.com/vkarpov15/kareem/commit/285325e))
 
-- The `HelmetOptions` interface is no longer exported. This only affects TypeScript users. If you need the functionality back, see [this comment](https://github.com/helmetjs/helmet/issues/235#issuecomment-674016883)
 
-## 4.0.0 - 2020-08-02
 
-See the [Helmet 4 upgrade guide](https://github.com/helmetjs/helmet/wiki/Helmet-4-upgrade-guide) for help upgrading from Helmet 3.
+<a name="1.3.0"></a>
+## 1.3.0 (2017-03-26)
 
-### Added
+* chore: release 1.3.0 ([f3a9e50](https://github.com/vkarpov15/kareem/commit/f3a9e50))
+* feat: pass function args to execPre ([4dd466d](https://github.com/vkarpov15/kareem/commit/4dd466d))
 
-- `helmet.contentSecurityPolicy`:
-  - If no `default-src` directive is supplied, an error is thrown
-  - Directive lists can be any iterable, not just arrays
 
-### Changed
 
-- This package no longer has dependencies. This should have no effect on end users, other than speeding up installation time.
-- `helmet.contentSecurityPolicy`:
-  - There is now a default set of directives if none are supplied
-  - Duplicate keys now throw an error. See [helmetjs/csp#73](https://github.com/helmetjs/csp/issues/73)
-  - This middleware is more lenient, allowing more directive names or values
-- `helmet.xssFilter` now disables the buggy XSS filter by default. See [#230](https://github.com/helmetjs/helmet/issues/230)
+<a name="1.2.1"></a>
+## <small>1.2.1 (2017-02-03)</small>
 
-### Removed
+* chore: release 1.2.1 ([d97081f](https://github.com/vkarpov15/kareem/commit/d97081f))
+* fix: filter out _kareemIgnored args for error handlers re: Automattic/mongoose#4925 ([ddc7aeb](https://github.com/vkarpov15/kareem/commit/ddc7aeb)), closes [Automattic/mongoose#4925](https://github.com/Automattic/mongoose/issues/4925)
+* fix: make error handlers handle errors in pre hooks ([af38033](https://github.com/vkarpov15/kareem/commit/af38033)), closes [Automattic/mongoose#4927](https://github.com/Automattic/mongoose/issues/4927)
 
-- Dropped support for old Node versions. Node 10+ is now required
-- `helmet.featurePolicy`. If you still need it, use the `feature-policy` package on npm.
-- `helmet.hpkp`. If you still need it, use the `hpkp` package on npm.
-- `helmet.noCache`. If you still need it, use the `nocache` package on npm.
-- `helmet.contentSecurityPolicy`:
-  - Removed browser sniffing (including the `browserSniff` and `disableAndroid` parameters). See [helmetjs/csp#97](https://github.com/helmetjs/csp/issues/97)
-  - Removed conditional support. This includes directive functions and support for a function as the `reportOnly`. [Read this if you need help.](https://github.com/helmetjs/helmet/wiki/Conditionally-using-middleware)
-  - Removed a lot of checks—you should be checking your CSP with a different tool
-  - Removed support for legacy headers (and therefore the `setAllHeaders` parameter). [Read this if you need help.](https://github.com/helmetjs/helmet/wiki/Setting-legacy-Content-Security-Policy-headers-in-Helmet-4)
-  - Removed the `loose` option
-  - Removed support for functions as directive values. You must supply an iterable of strings
-- `helmet.frameguard`:
-  - Dropped support for the `ALLOW-FROM` action. [Read more here.](https://github.com/helmetjs/helmet/wiki/How-to-use-X%E2%80%93Frame%E2%80%93Options's-%60ALLOW%E2%80%93FROM%60-directive)
-- `helmet.hidePoweredBy` no longer accepts arguments. See [this article](https://github.com/helmetjs/helmet/wiki/How-to-set-a-custom-X%E2%80%93Powered%E2%80%93By-header) to see how to replicate the removed behavior. See [#224](https://github.com/helmetjs/helmet/issues/224).
-- `helmet.hsts`:
-  - Dropped support for `includeSubdomains` with a lowercase D. See [#231](https://github.com/helmetjs/helmet/issues/231)
-  - Dropped support for `setIf`. [Read this if you need help.](https://github.com/helmetjs/helmet/wiki/Conditionally-using-middleware) See [#232](https://github.com/helmetjs/helmet/issues/232)
-- `helmet.xssFilter` no longer accepts options. Read ["How to disable blocking with X-XSS-Protection"](https://github.com/helmetjs/helmet/wiki/How-to-disable-blocking-with-X%E2%80%93XSS%E2%80%93Protection) and ["How to enable the `report` directive with X-XSS-Protection"](https://github.com/helmetjs/helmet/wiki/How-to-enable-the-%60report%60-directive-with-X%E2%80%93XSS%E2%80%93Protection) if you need the legacy behavior.
 
-## 3.23.3 - 2020-06-26
 
-### Changed
+<a name="1.2.0"></a>
+## 1.2.0 (2017-01-02)
 
-- `helmet.expectCt` is no longer a separate package. This should have no effect on end users.
-- `helmet.frameguard` is no longer a separate package. This should have no effect on end users.
+* chore: release 1.2.0 ([033225c](https://github.com/vkarpov15/kareem/commit/033225c))
+* chore: upgrade deps ([f9e9a09](https://github.com/vkarpov15/kareem/commit/f9e9a09))
+* feat: add _kareemIgnore re: Automattic/mongoose#4836 ([7957771](https://github.com/vkarpov15/kareem/commit/7957771)), closes [Automattic/mongoose#4836](https://github.com/Automattic/mongoose/issues/4836)
 
-## 3.23.2 - 2020-06-23
 
-### Changed
 
-- `helmet.dnsPrefetchControl` is no longer a separate package. This should have no effect on end users.
+<a name="1.1.5"></a>
+## <small>1.1.5 (2016-12-13)</small>
 
-## 3.23.1 - 2020-06-16
+* chore: release 1.1.5 ([1a9f684](https://github.com/vkarpov15/kareem/commit/1a9f684))
+* fix: correct field name ([04a0e9d](https://github.com/vkarpov15/kareem/commit/04a0e9d))
 
-### Changed
 
-- `helmet.ieNoOpen` is no longer a separate package. This should have no effect on end users.
 
-## 3.23.0 - 2020-06-12
+<a name="1.1.4"></a>
+## <small>1.1.4 (2016-12-09)</small>
 
-### Deprecated
+* chore: release 1.1.4 ([ece401c](https://github.com/vkarpov15/kareem/commit/ece401c))
+* chore: run tests on node 6 ([e0cb1cb](https://github.com/vkarpov15/kareem/commit/e0cb1cb))
+* fix: only copy own properties in clone() ([dfe28ce](https://github.com/vkarpov15/kareem/commit/dfe28ce)), closes [#7](https://github.com/vkarpov15/kareem/issues/7)
 
-- `helmet.featurePolicy` is deprecated. Use the `feature-policy` module instead.
 
-## 3.22.1 - 2020-06-10
 
-### Changed
+<a name="1.1.3"></a>
+## <small>1.1.3 (2016-06-27)</small>
 
-- Rewrote internals in TypeScript. This should have no effect on end users.
+* chore: release 1.1.3 ([87171c8](https://github.com/vkarpov15/kareem/commit/87171c8))
+* fix: couple more issues with arg processing ([c65f523](https://github.com/vkarpov15/kareem/commit/c65f523))
 
-## 3.22.0 - 2020-03-24
 
-### Changed
 
-- Updated `helmet-csp` to v2.10.0
-  - Add support for the `allow-downloads` sandbox directive. See [helmet-csp#103](https://github.com/helmetjs/csp/pull/103)
+<a name="1.1.2"></a>
+## <small>1.1.2 (2016-06-27)</small>
 
-### Deprecated
+* chore: release 1.1.2 ([8e102b6](https://github.com/vkarpov15/kareem/commit/8e102b6))
+* fix: add early return ([4feda4e](https://github.com/vkarpov15/kareem/commit/4feda4e))
 
-- `helmet.noCache` is deprecated. Use the `nocache` module instead. See [#215](https://github.com/helmetjs/helmet/issues/215)
 
-## 3.21.3 - 2020-02-24
 
-### Changed
+<a name="1.1.1"></a>
+## <small>1.1.1 (2016-06-27)</small>
 
-- Updated `helmet-csp` to v2.9.5
-  - Updated `bowser` subdependency from 2.7.0 to 2.9.0
-  - Fixed an issue some people were having when importing the `bowser` subdependency. See [helmet-csp#96](https://github.com/helmetjs/csp/issues/96) and [#101](https://github.com/helmetjs/csp/pull/101)
+* chore: release 1.1.1 ([8bb3050](https://github.com/vkarpov15/kareem/commit/8bb3050))
+* fix: skip error handlers if no error ([0eb3a44](https://github.com/vkarpov15/kareem/commit/0eb3a44))
 
-## 3.21.2 - 2019-10-21
 
-### Changed
 
-- Updated `helmet-csp` to v2.9.4
-  - Updated `bowser` subdependency from 2.6.1 to 2.7.0. See [helmet-csp#94](https://github.com/helmetjs/csp/pull/94)
+<a name="1.1.0"></a>
+## 1.1.0 (2016-05-11)
 
-## 3.21.1 - 2019-09-20
+* chore: release 1.1.0 ([85332d9](https://github.com/vkarpov15/kareem/commit/85332d9))
+* chore: test on node 4 and node 5 ([1faefa1](https://github.com/vkarpov15/kareem/commit/1faefa1))
+* 100% coverage again ([c9aee4e](https://github.com/vkarpov15/kareem/commit/c9aee4e))
+* add support for error post hooks ([d378113](https://github.com/vkarpov15/kareem/commit/d378113))
+* basic setup for sync hooks #4 ([55aa081](https://github.com/vkarpov15/kareem/commit/55aa081)), closes [#4](https://github.com/vkarpov15/kareem/issues/4)
+* proof of concept for error handlers ([e4a07d9](https://github.com/vkarpov15/kareem/commit/e4a07d9))
+* refactor out handleWrapError helper ([b19af38](https://github.com/vkarpov15/kareem/commit/b19af38))
 
-### Fixed
 
-- Updated `helmet-csp` to v2.9.2
-  - Fixed a bug where a request from Firefox 4 could delete `default-src` from future responses
-  - Fixed tablet PC detection by updating `bowser` subdependency to latest version
 
-## 3.21.0 - 2019-09-04
+<a name="1.0.1"></a>
+## <small>1.0.1 (2015-05-10)</small>
 
-### Added
+* Fix #1 ([de60dc6](https://github.com/vkarpov15/kareem/commit/de60dc6)), closes [#1](https://github.com/vkarpov15/kareem/issues/1)
+* release 1.0.1 ([6971088](https://github.com/vkarpov15/kareem/commit/6971088))
+* Run tests on iojs in travis ([adcd201](https://github.com/vkarpov15/kareem/commit/adcd201))
+* support legacy post hook behavior in wrap() ([23fa74c](https://github.com/vkarpov15/kareem/commit/23fa74c))
+* Use node 0.12 in travis ([834689d](https://github.com/vkarpov15/kareem/commit/834689d))
 
-- Updated `x-xss-protection` to v1.3.0
-  - Added `mode: null` to disable `mode=block`
 
-### Changed
 
-- Updated `helmet-csp` to v2.9.1
-  - Updated `bowser` subdependency from 2.5.3 to 2.5.4. See [helmet-csp#88](https://github.com/helmetjs/csp/pull/88)
+<a name="1.0.0"></a>
+## 1.0.0 (2015-01-28)
 
-## 3.20.1 - 2019-08-28
+* Tag 1.0.0 ([4c5a35a](https://github.com/vkarpov15/kareem/commit/4c5a35a))
 
-### Changed
 
-- Updated `helmet-csp` to v2.9.0
 
-## 3.20.0 - 2019-07-24
+<a name="0.0.8"></a>
+## <small>0.0.8 (2015-01-27)</small>
 
-### Changed
+* Add clone function ([688bba7](https://github.com/vkarpov15/kareem/commit/688bba7))
+* Add jscs for style checking ([5c93149](https://github.com/vkarpov15/kareem/commit/5c93149))
+* Bump 0.0.8 ([03c0d2f](https://github.com/vkarpov15/kareem/commit/03c0d2f))
+* Fix jscs config, add gulp rules ([9989abf](https://github.com/vkarpov15/kareem/commit/9989abf))
+* fix Makefile typo ([1f7e61a](https://github.com/vkarpov15/kareem/commit/1f7e61a))
 
-- Updated `helmet-csp` to v2.8.0
 
-## 3.19.0 - 2019-07-17
 
-### Changed
+<a name="0.0.7"></a>
+## <small>0.0.7 (2015-01-04)</small>
 
-- Updated `dns-prefetch-control` to v0.2.0
-- Updated `dont-sniff-mimetype` to v1.1.0
-- Updated `helmet-crossdomain` to v0.4.0
-- Updated `hide-powered-by` to v1.1.0
-- Updated `x-xss-protection` to v1.2.0
+* Bump 0.0.7 ([98ef173](https://github.com/vkarpov15/kareem/commit/98ef173))
+* fix LearnBoost/mongoose#2553 - use null instead of undefined for err ([9157b48](https://github.com/vkarpov15/kareem/commit/9157b48)), closes [LearnBoost/mongoose#2553](https://github.com/LearnBoost/mongoose/issues/2553)
+* Regenerate docs ([2331cdf](https://github.com/vkarpov15/kareem/commit/2331cdf))
 
-## 3.18.0 - 2019-05-05
 
-### Added
 
-- `featurePolicy` has 19 new features: `ambientLightSensor`, `documentDomain`, `documentWrite`, `encryptedMedia`, `fontDisplayLateSwap`, `layoutAnimations`, `legacyImageFormats`, `loadingFrameDefaultEager`, `oversizedImages`, `pictureInPicture`, `serial`, `syncScript`, `unoptimizedImages`, `unoptimizedLosslessImages`, `unoptimizedLossyImages`, `unsizedMedia`, `verticalScroll`, `wakeLock`, and `xr`
+<a name="0.0.6"></a>
+## <small>0.0.6 (2015-01-01)</small>
 
-### Changed
+* Update docs and bump 0.0.6 ([92c12a7](https://github.com/vkarpov15/kareem/commit/92c12a7))
 
-- Updated `expect-ct` to v0.2.0
-- Updated `feature-policy` to v0.3.0
-- Updated `frameguard` to v3.1.0
-- Updated `nocache` to v2.1.0
 
-## 3.17.0 - 2019-05-03
 
-### Added
+<a name="0.0.5"></a>
+## <small>0.0.5 (2015-01-01)</small>
 
-- `referrerPolicy` now supports multiple values
+* Add coverage rule to Makefile ([825a91c](https://github.com/vkarpov15/kareem/commit/825a91c))
+* Add coveralls to README ([fb52369](https://github.com/vkarpov15/kareem/commit/fb52369))
+* Add coveralls to travis ([93f6f15](https://github.com/vkarpov15/kareem/commit/93f6f15))
+* Add createWrapper() function ([ea77741](https://github.com/vkarpov15/kareem/commit/ea77741))
+* Add istanbul code coverage ([6eceeef](https://github.com/vkarpov15/kareem/commit/6eceeef))
+* Add some more comments for examples ([c5b0c6f](https://github.com/vkarpov15/kareem/commit/c5b0c6f))
+* Add travis ([e6dcb06](https://github.com/vkarpov15/kareem/commit/e6dcb06))
+* Add travis badge to docs ([ad8c9b3](https://github.com/vkarpov15/kareem/commit/ad8c9b3))
+* Add wrap() tests, 100% coverage ([6945be4](https://github.com/vkarpov15/kareem/commit/6945be4))
+* Better test coverage for execPost ([d9ad539](https://github.com/vkarpov15/kareem/commit/d9ad539))
+* Bump 0.0.5 ([69875b1](https://github.com/vkarpov15/kareem/commit/69875b1))
+* Docs fix ([15b7098](https://github.com/vkarpov15/kareem/commit/15b7098))
+* Fix silly mistake in docs generation ([50373eb](https://github.com/vkarpov15/kareem/commit/50373eb))
+* Fix typo in readme ([fec4925](https://github.com/vkarpov15/kareem/commit/fec4925))
+* Linkify travis badge ([92b25fe](https://github.com/vkarpov15/kareem/commit/92b25fe))
+* Make travis run coverage ([747157b](https://github.com/vkarpov15/kareem/commit/747157b))
+* Move travis status badge ([d52e89b](https://github.com/vkarpov15/kareem/commit/d52e89b))
+* Quick fix for coverage ([50bbddb](https://github.com/vkarpov15/kareem/commit/50bbddb))
+* Typo fix ([adea794](https://github.com/vkarpov15/kareem/commit/adea794))
 
-### Changed
 
-- Updated `referrerPolicy` to v1.2.0
 
-## 3.16.0 - 2019-03-10
+<a name="0.0.4"></a>
+## <small>0.0.4 (2014-12-13)</small>
 
-### Added
+* Bump 0.0.4, run docs generation ([51a15fe](https://github.com/vkarpov15/kareem/commit/51a15fe))
+* Use correct post parameters in wrap() ([9bb5da3](https://github.com/vkarpov15/kareem/commit/9bb5da3))
 
-- Add email to `bugs` field in `package.json`
 
-### Changed
 
-- Updated `hsts` to v2.2.0
-- Updated `ienoopen` to v1.1.0
-- Changelog is now in the [Keep A Changelog](https://keepachangelog.com/) format
-- Dropped support for Node <4. See [the commit](https://github.com/helmetjs/helmet/commit/a49cec3ca58cce484d2d05e1f908549caa92ed03) for more information
-- Updated Adam Baldwin's contact information
+<a name="0.0.3"></a>
+## <small>0.0.3 (2014-12-12)</small>
 
-### Deprecated
+* Add npm test script, fix small bug with args not getting passed through post ([49e3e68](https://github.com/vkarpov15/kareem/commit/49e3e68))
+* Bump 0.0.3 ([65621d8](https://github.com/vkarpov15/kareem/commit/65621d8))
+* Update readme ([901388b](https://github.com/vkarpov15/kareem/commit/901388b))
 
-- `helmet.hsts`'s `setIf` option has been deprecated and will be removed in `hsts@3`. See [helmetjs/hsts#22](https://github.com/helmetjs/hsts/issues/22) for more
 
-* The `includeSubdomains` option (with a lowercase `d`) has been deprecated and will be removed in `hsts@3`. Use the uppercase-D `includeSubDomains` option instead. See [helmetjs/hsts#21](https://github.com/helmetjs/hsts/issues/21) for more
 
-## 3.15.1 - 2019-02-10
+<a name="0.0.2"></a>
+## <small>0.0.2 (2014-12-12)</small>
 
-### Deprecated
+* Add github repo and bump 0.0.2 ([59db8be](https://github.com/vkarpov15/kareem/commit/59db8be))
 
-- The `hpkp` middleware has been deprecated. If you still need to use this module, install the standalone `hpkp` module from npm. See [#180](https://github.com/helmetjs/helmet/issues/180) for more.
 
-## 3.15.0 - 2018-11-07
 
-### Added
+<a name="0.0.1"></a>
+## <small>0.0.1 (2014-12-12)</small>
 
-- `helmet.featurePolicy` now supports four new features
+* Add basic docs ([ad29ea4](https://github.com/vkarpov15/kareem/commit/ad29ea4))
+* Add pre hooks ([2ffc356](https://github.com/vkarpov15/kareem/commit/2ffc356))
+* Add wrap function ([68c540c](https://github.com/vkarpov15/kareem/commit/68c540c))
+* Bump to version 0.0.1 ([a4bfd68](https://github.com/vkarpov15/kareem/commit/a4bfd68))
+* Initial commit ([4002458](https://github.com/vkarpov15/kareem/commit/4002458))
+* Initial deposit ([98fc489](https://github.com/vkarpov15/kareem/commit/98fc489))
+* Post hooks ([395b67c](https://github.com/vkarpov15/kareem/commit/395b67c))
+* Some basic setup work ([82df75e](https://github.com/vkarpov15/kareem/commit/82df75e))
+* Support sync pre hooks ([1cc1b9f](https://github.com/vkarpov15/kareem/commit/1cc1b9f))
+* Update package.json description ([978da18](https://github.com/vkarpov15/kareem/commit/978da18))
 
-## 3.14.0 - 2018-10-09
 
-### Added
 
-- `helmet.featurePolicy` middleware
+<a name="2.2.5"></a>
+## <small>2.2.5 (2018-09-24)</small>
 
-## 3.13.0 - 2018-07-22
 
-### Added
 
-- `helmet.permittedCrossDomainPolicies` middleware
 
-## 3.12.2 - 2018-07-20
+<a name="2.2.4"></a>
+## <small>2.2.4 (2018-09-24)</small>
 
-### Fixed
 
-- Removed `lodash.reduce` dependency from `csp`
 
-## 3.12.1 - 2018-05-16
 
-### Fixed
+<a name="2.2.3"></a>
+## <small>2.2.3 (2018-09-24)</small>
 
-- `expectCt` should use comma instead of semicolon as delimiter
+* fix(filter): copy async pres correctly with `filter()` ([1b1ed8a](https://github.com/vkarpov15/kareem/commit/1b1ed8a)), closes [Automattic/mongoose#3054](https://github.com/Automattic/mongoose/issues/3054)
+* feat: add filter() function ([1f641f4](https://github.com/vkarpov15/kareem/commit/1f641f4))
+* feat: support storing options on pre and post hooks ([59220b9](https://github.com/vkarpov15/kareem/commit/59220b9))
 
-## 3.12.0 - 2018-03-02
 
-### Added
 
-- `xssFilter` now supports `reportUri` option
+<a name="2.2.3"></a>
+## <small>2.2.3 (2018-09-10)</small>
 
-## 3.11.0 - 2018-02-09
+* chore: release 2.2.3 ([af653a3](https://github.com/vkarpov15/kareem/commit/af653a3))
 
-### Added
 
-- Main Helmet middleware is now named to help with debugging
 
-## 3.10.0 - 2018-01-23
+<a name="2.2.2"></a>
+## <small>2.2.2 (2018-09-10)</small>
 
-### Added
+* chore: release 2.2.2 ([3f0144d](https://github.com/vkarpov15/kareem/commit/3f0144d))
+* fix: allow merge() to not clone ([e628d65](https://github.com/vkarpov15/kareem/commit/e628d65))
 
-- `csp` now supports `prefix-src` directive
 
-### Fixed
 
-- `csp` no longer loads JSON files internally, helping some module bundlers
-- `false` should be able to disable a CSP directive
+<a name="2.2.1"></a>
+## <small>2.2.1 (2018-06-05)</small>
 
-## 3.9.0 - 2017-10-13
+* chore: release 2.2.1 ([4625a64](https://github.com/vkarpov15/kareem/commit/4625a64))
+* chore: remove lockfile from git ([7f3e4e6](https://github.com/vkarpov15/kareem/commit/7f3e4e6))
+* fix: handle numAsync correctly when merging ([fef8e7e](https://github.com/vkarpov15/kareem/commit/fef8e7e))
+* test: repro issue with not copying numAsync ([952d9db](https://github.com/vkarpov15/kareem/commit/952d9db))
 
-### Added
 
-- `csp` now supports `strict-dynamic` value
-- `csp` now supports `require-sri-for` directive
 
-### Changed
+<a name="2.2.0"></a>
+## 2.2.0 (2018-06-05)
 
-- Removed `connect` dependency
+* chore: release 2.2.0 ([ff9ad03](https://github.com/vkarpov15/kareem/commit/ff9ad03))
+* fix: use maps instead of objects for _pres and _posts so `toString()` doesn't get reported as having ([55df303](https://github.com/vkarpov15/kareem/commit/55df303)), closes [Automattic/mongoose#6538](https://github.com/Automattic/mongoose/issues/6538)
 
-## 3.8.2 - 2017-09-27
 
-### Changed
 
-- Updated `connect` dependency to latest
+<a name="2.1.0"></a>
+## 2.1.0 (2018-05-16)
 
-## 3.8.1 - 2017-07-28
+* chore: release 2.1.0 ([ba5f1bc](https://github.com/vkarpov15/kareem/commit/ba5f1bc))
+* feat: add option to check wrapped function return value for promises ([c9d7dd1](https://github.com/vkarpov15/kareem/commit/c9d7dd1))
+* refactor: use const in wrap() ([0fc21f9](https://github.com/vkarpov15/kareem/commit/0fc21f9))
 
-### Fixed
 
-- `csp` does not automatically set `report-to` when setting `report-uri`
 
-## 3.8.0 - 2017-07-21
+<a name="2.0.7"></a>
+## <small>2.0.7 (2018-04-28)</small>
 
-### Changed
+* chore: release 2.0.7 ([0bf91e6](https://github.com/vkarpov15/kareem/commit/0bf91e6))
+* feat: add `hasHooks()` ([225f18d](https://github.com/vkarpov15/kareem/commit/225f18d)), closes [Automattic/mongoose#6385](https://github.com/Automattic/mongoose/issues/6385)
 
-- `hsts` no longer cares whether it's HTTPS and always sets the header
 
-## 3.7.0 - 2017-07-21
 
-### Added
+<a name="2.0.6"></a>
+## <small>2.0.6 (2018-03-22)</small>
 
-- `csp` now supports `report-to` directive
+* chore: release 2.0.6 ([f3d406b](https://github.com/vkarpov15/kareem/commit/f3d406b))
+* fix(wrap): ensure fast path still wraps function in `nextTick()` for chaining ([7000494](https://github.com/vkarpov15/kareem/commit/7000494)), closes [Automattic/mongoose#6250](https://github.com/Automattic/mongoose/issues/6250) [dsanel/mongoose-delete#36](https://github.com/dsanel/mongoose-delete/issues/36)
 
-### Changed
 
-- Throw an error when used incorrectly
-- Add a few documentation files to `npmignore`
 
-## 3.6.1 - 2017-05-21
+<a name="2.0.5"></a>
+## <small>2.0.5 (2018-02-22)</small>
 
-### Changed
+* chore: release 2.0.5 ([3286612](https://github.com/vkarpov15/kareem/commit/3286612))
+* perf(createWrapper): don't create wrapper if there are no hooks ([5afc5b9](https://github.com/vkarpov15/kareem/commit/5afc5b9)), closes [Automattic/mongoose#6126](https://github.com/Automattic/mongoose/issues/6126)
 
-- Bump `connect` version
 
-## 3.6.0 - 2017-05-04
 
-### Added
+<a name="2.0.4"></a>
+## <small>2.0.4 (2018-02-08)</small>
 
-- `expectCt` middleware for setting the `Expect-CT` header
+* chore: release 2.0.4 ([2ab0293](https://github.com/vkarpov15/kareem/commit/2ab0293))
 
-## 3.5.0 - 2017-03-06
 
-### Added
 
-- `csp` now supports the `worker-src` directive
+<a name="2.0.3"></a>
+## <small>2.0.3 (2018-02-01)</small>
 
-## 3.4.1 - 2017-02-24
+* chore: release 2.0.3 ([3c1abe5](https://github.com/vkarpov15/kareem/commit/3c1abe5))
+* fix: use process.nextTick() re: Automattic/mongoose#6074 ([e5bfe33](https://github.com/vkarpov15/kareem/commit/e5bfe33)), closes [Automattic/mongoose#6074](https://github.com/Automattic/mongoose/issues/6074)
 
-### Changed
 
-- Bump `connect` version
 
-## 3.4.0 - 2017-01-13
+<a name="2.0.2"></a>
+## <small>2.0.2 (2018-01-24)</small>
 
-### Added
+* chore: fix license ([a9d755c](https://github.com/vkarpov15/kareem/commit/a9d755c)), closes [#10](https://github.com/vkarpov15/kareem/issues/10)
+* chore: release 2.0.2 ([fe87ab6](https://github.com/vkarpov15/kareem/commit/fe87ab6))
 
-- `csp` now supports more `sandbox` directives
 
-## 3.3.0 - 2016-12-31
 
-### Added
+<a name="2.0.1"></a>
+## <small>2.0.1 (2018-01-09)</small>
 
-- `referrerPolicy` allows `strict-origin` and `strict-origin-when-cross-origin` directives
+* chore: release 2.0.1 with lockfile bump ([09c44fb](https://github.com/vkarpov15/kareem/commit/09c44fb))
 
-### Changed
 
-- Bump `connect` version
 
-## 3.2.0 - 2016-12-22
+<a name="2.0.0"></a>
+## 2.0.0 (2018-01-09)
 
-### Added
+* chore: bump marked re: security ([cc564a9](https://github.com/vkarpov15/kareem/commit/cc564a9))
+* chore: release 2.0.0 ([f511d1c](https://github.com/vkarpov15/kareem/commit/f511d1c))
 
-- `csp` now allows `manifest-src` directive
 
-## 3.1.0 - 2016-11-03
 
-### Added
+<a name="2.0.0-rc5"></a>
+## 2.0.0-rc5 (2017-12-23)
 
-- `csp` now allows `frame-src` directive
+* chore: fix build on node 4+5 ([6dac5a4](https://github.com/vkarpov15/kareem/commit/6dac5a4))
+* chore: fix built on node 4 + 5 again ([434ef0a](https://github.com/vkarpov15/kareem/commit/434ef0a))
+* chore: release 2.0.0-rc5 ([25a32ee](https://github.com/vkarpov15/kareem/commit/25a32ee))
 
-## 3.0.0 - 2016-10-28
 
-### Changed
 
-- `csp` will check your directives for common mistakes and throw errors if it finds them. This can be disabled with `loose: true`.
-- Empty arrays are no longer allowed in `csp`. For source lists (like `script-src` or `object-src`), use the standard `scriptSrc: ["'none'"]`. The `sandbox` directive can be `sandbox: true` to block everything.
-- `false` can disable a CSP directive. For example, `scriptSrc: false` is the same as not specifying it.
-- In CSP, `reportOnly: true` no longer requires a `report-uri` to be set.
-- `hsts`'s `maxAge` now defaults to 180 days (instead of 1 day)
-- `hsts`'s `maxAge` parameter is seconds, not milliseconds
-- `hsts` includes subdomains by default
-- `domain` parameter in `frameguard` cannot be empty
+<a name="2.0.0-rc4"></a>
+## 2.0.0-rc4 (2017-12-22)
 
-### Removed
+* chore: release 2.0.0-rc4 ([49fc083](https://github.com/vkarpov15/kareem/commit/49fc083))
+* BREAKING CHANGE: deduplicate when merging hooks re: Automattic/mongoose#2945 ([d458573](https://github.com/vkarpov15/kareem/commit/d458573)), closes [Automattic/mongoose#2945](https://github.com/Automattic/mongoose/issues/2945)
 
-- `noEtag` option no longer present in `noCache`
-- iOS Chrome `connect-src` workaround in CSP module
 
-## 2.3.0 - 2016-09-30
 
-### Added
+<a name="2.0.0-rc3"></a>
+## 2.0.0-rc3 (2017-12-22)
 
-- `hpkp` middleware now supports the `includeSubDomains` property with a capital D
+* chore: release 2.0.0-rc3 ([adaaa00](https://github.com/vkarpov15/kareem/commit/adaaa00))
+* feat: support returning promises from middleware functions ([05b4480](https://github.com/vkarpov15/kareem/commit/05b4480)), closes [Automattic/mongoose#3779](https://github.com/Automattic/mongoose/issues/3779)
 
-### Fixed
 
-- `hpkp` was setting `includeSubdomains` instead of `includeSubDomains`
 
-## 2.2.0 - 2016-09-16
+<a name="2.0.0-rc2"></a>
+## 2.0.0-rc2 (2017-12-21)
 
-### Added
+* chore: release 2.0.0-rc2 ([76325fa](https://github.com/vkarpov15/kareem/commit/76325fa))
+* fix: ensure next() and done() run in next tick ([6c20684](https://github.com/vkarpov15/kareem/commit/6c20684))
 
-- `referrerPolicy` middleware
 
-## 2.1.3 - 2016-09-07
 
-### Changed
+<a name="2.0.0-rc1"></a>
+## 2.0.0-rc1 (2017-12-21)
 
-- Top-level aliases (like `helmet.xssFilter`) are no longer dynamically required
+* chore: improve test coverage re: Automattic/mongoose#3232 ([7b45cf0](https://github.com/vkarpov15/kareem/commit/7b45cf0)), closes [Automattic/mongoose#3232](https://github.com/Automattic/mongoose/issues/3232)
+* chore: release 2.0.0-rc1 ([9b83f52](https://github.com/vkarpov15/kareem/commit/9b83f52))
+* BREAKING CHANGE: report sync exceptions as errors, only allow calling next() and done() once ([674adcc](https://github.com/vkarpov15/kareem/commit/674adcc)), closes [Automattic/mongoose#3483](https://github.com/Automattic/mongoose/issues/3483)
 
-## 2.1.2 - 2016-07-27
 
-### Deprecated
 
-- `nocache`'s `noEtag` option is now deprecated
+<a name="2.0.0-rc0"></a>
+## 2.0.0-rc0 (2017-12-17)
 
-### Fixed
+* chore: release 2.0.0-rc0 ([16b44b5](https://github.com/vkarpov15/kareem/commit/16b44b5))
+* BREAKING CHANGE: drop support for node < 4 ([9cbb8c7](https://github.com/vkarpov15/kareem/commit/9cbb8c7))
+* BREAKING CHANGE: remove useLegacyPost and add several new features ([6dd8531](https://github.com/vkarpov15/kareem/commit/6dd8531)), closes [Automattic/mongoose#3232](https://github.com/Automattic/mongoose/issues/3232)
 
-- `csp` now better handles Firefox on mobile
 
-## 2.1.1 - 2016-06-10
 
-### Changed
+<a name="1.5.0"></a>
+## 1.5.0 (2017-07-20)
 
-- Remove several dependencies from `helmet-csp`
+* chore: release 1.5.0 ([9c491a0](https://github.com/vkarpov15/kareem/commit/9c491a0))
+* fix: improve post error handlers results ([9928dd5](https://github.com/vkarpov15/kareem/commit/9928dd5)), closes [Automattic/mongoose#5466](https://github.com/Automattic/mongoose/issues/5466)
 
-### Fixed
 
-- `frameguard` had a documentation error about its default value
-- `frameguard` docs in main Helmet readme said `frameguard`, not `helmet.frameguard`
 
-## 2.1.0 - 2016-05-18
+<a name="1.4.2"></a>
+## <small>1.4.2 (2017-07-06)</small>
 
-### Added
+* chore: release 1.4.2 ([8d14ac5](https://github.com/vkarpov15/kareem/commit/8d14ac5))
+* fix: correct args re: Automattic/mongoose#5405 ([3f28ae6](https://github.com/vkarpov15/kareem/commit/3f28ae6)), closes [Automattic/mongoose#5405](https://github.com/Automattic/mongoose/issues/5405)
 
-- `csp` lets you dynamically set `reportOnly`
 
-## 2.0.0 - 2016-04-29
 
-### Added
+<a name="1.4.1"></a>
+## <small>1.4.1 (2017-04-25)</small>
 
-- Pass configuration to enable/disable default middlewares
+* chore: release 1.4.1 ([5ecf0c2](https://github.com/vkarpov15/kareem/commit/5ecf0c2))
+* fix: handle numAsyncPres with clone() ([c72e857](https://github.com/vkarpov15/kareem/commit/c72e857)), closes [#8](https://github.com/vkarpov15/kareem/issues/8)
+* test: repro #8 ([9b4d6b2](https://github.com/vkarpov15/kareem/commit/9b4d6b2)), closes [#8](https://github.com/vkarpov15/kareem/issues/8)
 
-### Changed
 
-- `dnsPrefetchControl` middleware is now enabled by default
 
-### Removed
+<a name="1.4.0"></a>
+## 1.4.0 (2017-04-19)
 
-- No more module aliases. There is now just one way to include each middleware
-- `frameguard` can no longer be initialized with strings; you must use an object
+* chore: release 1.4.0 ([101c5f5](https://github.com/vkarpov15/kareem/commit/101c5f5))
+* feat: add merge() function ([285325e](https://github.com/vkarpov15/kareem/commit/285325e))
 
-### Fixed
 
-- Make `hpkp` lowercase in documentation
-- Update `hpkp` spec URL in readmes
-- Update `frameguard` header name in readme
 
-## 1.3.0 - 2016-03-01
+<a name="1.3.0"></a>
+## 1.3.0 (2017-03-26)
 
-### Added
+* chore: release 1.3.0 ([f3a9e50](https://github.com/vkarpov15/kareem/commit/f3a9e50))
+* feat: pass function args to execPre ([4dd466d](https://github.com/vkarpov15/kareem/commit/4dd466d))
 
-- `hpkp` has a `setIf` option to conditionally set the header
 
-## 1.2.0 - 2016-02-29
 
-### Added
+<a name="1.2.1"></a>
+## <small>1.2.1 (2017-02-03)</small>
 
-- `csp` now has a `browserSniff` option to disable all user-agent sniffing
+* chore: release 1.2.1 ([d97081f](https://github.com/vkarpov15/kareem/commit/d97081f))
+* fix: filter out _kareemIgnored args for error handlers re: Automattic/mongoose#4925 ([ddc7aeb](https://github.com/vkarpov15/kareem/commit/ddc7aeb)), closes [Automattic/mongoose#4925](https://github.com/Automattic/mongoose/issues/4925)
+* fix: make error handlers handle errors in pre hooks ([af38033](https://github.com/vkarpov15/kareem/commit/af38033)), closes [Automattic/mongoose#4927](https://github.com/Automattic/mongoose/issues/4927)
 
-### Changed
 
-- `frameguard` can now be initialized with options
-- Add `npmignore` file to speed up installs slightly
 
-## 1.1.0 - 2016-01-12
+<a name="1.2.0"></a>
+## 1.2.0 (2017-01-02)
 
-### Added
+* chore: release 1.2.0 ([033225c](https://github.com/vkarpov15/kareem/commit/033225c))
+* chore: upgrade deps ([f9e9a09](https://github.com/vkarpov15/kareem/commit/f9e9a09))
+* feat: add _kareemIgnore re: Automattic/mongoose#4836 ([7957771](https://github.com/vkarpov15/kareem/commit/7957771)), closes [Automattic/mongoose#4836](https://github.com/Automattic/mongoose/issues/4836)
 
-- Code of conduct
-- `dnsPrefetchControl` middleware
 
-### Fixed
 
-- `csp` readme had syntax errors
+<a name="1.1.5"></a>
+## <small>1.1.5 (2016-12-13)</small>
 
-## 1.0.2 - 2016-01-08
+* chore: release 1.1.5 ([1a9f684](https://github.com/vkarpov15/kareem/commit/1a9f684))
+* fix: correct field name ([04a0e9d](https://github.com/vkarpov15/kareem/commit/04a0e9d))
 
-### Fixed
 
-- `csp` wouldn't recognize `IE Mobile` browsers
-- `csp` had some errors in its readme
-- Main readme had a syntax error
 
-## 1.0.1 - 2015-12-19
+<a name="1.1.4"></a>
+## <small>1.1.4 (2016-12-09)</small>
 
-### Fixed
+* chore: release 1.1.4 ([ece401c](https://github.com/vkarpov15/kareem/commit/ece401c))
+* chore: run tests on node 6 ([e0cb1cb](https://github.com/vkarpov15/kareem/commit/e0cb1cb))
+* fix: only copy own properties in clone() ([dfe28ce](https://github.com/vkarpov15/kareem/commit/dfe28ce)), closes [#7](https://github.com/vkarpov15/kareem/issues/7)
 
-- `csp` with no User Agent would cause errors
 
-## 1.0.0 - 2015-12-18
 
-### Added
+<a name="1.1.3"></a>
+## <small>1.1.3 (2016-06-27)</small>
 
-- `csp` module supports dynamically-generated values
+* chore: release 1.1.3 ([87171c8](https://github.com/vkarpov15/kareem/commit/87171c8))
+* fix: couple more issues with arg processing ([c65f523](https://github.com/vkarpov15/kareem/commit/c65f523))
 
-### Changed
 
-- `csp` directives are now under the `directives` key
-- `hpkp`'s `Report-Only` header is now opt-in, not opt-out
-- Tweak readmes of every sub-repo
 
-### Removed
+<a name="1.1.2"></a>
+## <small>1.1.2 (2016-06-27)</small>
 
-- `crossdomain` middleware
-- `csp` no longer throws errors when some directives aren't quoted (`'self'`, for example)
-- `maxage` option in the `hpkp` middleware
-- `safari5` option from `csp` module
+* chore: release 1.1.2 ([8e102b6](https://github.com/vkarpov15/kareem/commit/8e102b6))
+* fix: add early return ([4feda4e](https://github.com/vkarpov15/kareem/commit/4feda4e))
 
-### Fixed
 
-- Old Firefox Content-Security-Policy behavior for `unsafe-inline` and `unsafe-eval`
-- Dynamic `csp` policies is no longer recursive
 
-## 0.15.0 - 2015-11-26
+<a name="1.1.1"></a>
+## <small>1.1.1 (2016-06-27)</small>
 
-### Changed
+* chore: release 1.1.1 ([8bb3050](https://github.com/vkarpov15/kareem/commit/8bb3050))
+* fix: skip error handlers if no error ([0eb3a44](https://github.com/vkarpov15/kareem/commit/0eb3a44))
 
-- `hpkp` allows a `report-uri` without the `Report-Only` header
 
-## 0.14.0 - 2015-11-01
 
-### Added
+<a name="1.1.0"></a>
+## 1.1.0 (2016-05-11)
 
-- `nocache` now sends the `Surrogate-Control` header
+* chore: release 1.1.0 ([85332d9](https://github.com/vkarpov15/kareem/commit/85332d9))
+* chore: test on node 4 and node 5 ([1faefa1](https://github.com/vkarpov15/kareem/commit/1faefa1))
+* 100% coverage again ([c9aee4e](https://github.com/vkarpov15/kareem/commit/c9aee4e))
+* add support for error post hooks ([d378113](https://github.com/vkarpov15/kareem/commit/d378113))
+* basic setup for sync hooks #4 ([55aa081](https://github.com/vkarpov15/kareem/commit/55aa081)), closes [#4](https://github.com/vkarpov15/kareem/issues/4)
+* proof of concept for error handlers ([e4a07d9](https://github.com/vkarpov15/kareem/commit/e4a07d9))
+* refactor out handleWrapError helper ([b19af38](https://github.com/vkarpov15/kareem/commit/b19af38))
 
-### Changed
 
-- `nocache` no longer contains the `private` directive in the `Cache-Control` header
 
-## 0.13.0 - 2015-10-23
+<a name="1.0.1"></a>
+## <small>1.0.1 (2015-05-10)</small>
 
-### Added
+* Fix #1 ([de60dc6](https://github.com/vkarpov15/kareem/commit/de60dc6)), closes [#1](https://github.com/vkarpov15/kareem/issues/1)
+* release 1.0.1 ([6971088](https://github.com/vkarpov15/kareem/commit/6971088))
+* Run tests on iojs in travis ([adcd201](https://github.com/vkarpov15/kareem/commit/adcd201))
+* support legacy post hook behavior in wrap() ([23fa74c](https://github.com/vkarpov15/kareem/commit/23fa74c))
+* Use node 0.12 in travis ([834689d](https://github.com/vkarpov15/kareem/commit/834689d))
 
-- `xssFilter` now has a function name
-- Added new CSP docs to readme
 
-### Changed
 
-- HSTS option renamed from `includeSubdomains` to `includeSubDomains`
+<a name="1.0.0"></a>
+## 1.0.0 (2015-01-28)
 
-## 0.11.0 - 2015-09-18
+* Tag 1.0.0 ([4c5a35a](https://github.com/vkarpov15/kareem/commit/4c5a35a))
 
-### Added
 
-- `csp` now supports Microsoft Edge
-- CSP Level 2 support
 
-### Changed
+<a name="0.0.8"></a>
+## <small>0.0.8 (2015-01-27)</small>
 
-- Updated `connect` to 3.4.0
-- Updated `depd` to 1.1.0
+* Add clone function ([688bba7](https://github.com/vkarpov15/kareem/commit/688bba7))
+* Add jscs for style checking ([5c93149](https://github.com/vkarpov15/kareem/commit/5c93149))
+* Bump 0.0.8 ([03c0d2f](https://github.com/vkarpov15/kareem/commit/03c0d2f))
+* Fix jscs config, add gulp rules ([9989abf](https://github.com/vkarpov15/kareem/commit/9989abf))
+* fix Makefile typo ([1f7e61a](https://github.com/vkarpov15/kareem/commit/1f7e61a))
 
-### Fixed
 
-- Added `license` key to `csp`'s `package.json`
-- Empty `csp` directives now support every directive, not just `sandbox`
 
-## 0.10.0 - 2015-07-08
+<a name="0.0.7"></a>
+## <small>0.0.7 (2015-01-04)</small>
 
-### Added
+* Bump 0.0.7 ([98ef173](https://github.com/vkarpov15/kareem/commit/98ef173))
+* fix LearnBoost/mongoose#2553 - use null instead of undefined for err ([9157b48](https://github.com/vkarpov15/kareem/commit/9157b48)), closes [LearnBoost/mongoose#2553](https://github.com/LearnBoost/mongoose/issues/2553)
+* Regenerate docs ([2331cdf](https://github.com/vkarpov15/kareem/commit/2331cdf))
 
-- Add "Handling CSP violations" to `csp` readme
-- Add license to `package.json`
 
-### Changed
 
-- `hpkp` had a link to the wrong place in its readme
-- `hpkp` requires 2 or more pins
+<a name="0.0.6"></a>
+## <small>0.0.6 (2015-01-01)</small>
 
-### Fixed
+* Update docs and bump 0.0.6 ([92c12a7](https://github.com/vkarpov15/kareem/commit/92c12a7))
 
-- `hpkp` might have miscalculated `maxAge` slightly wrong
 
-## 0.9.0 - 2015-04-24
 
-### Changed
+<a name="0.0.5"></a>
+## <small>0.0.5 (2015-01-01)</small>
 
-- `nocache` adds `private` to its `Cache-Control` directive
-- Added a description to `package.json`
+* Add coverage rule to Makefile ([825a91c](https://github.com/vkarpov15/kareem/commit/825a91c))
+* Add coveralls to README ([fb52369](https://github.com/vkarpov15/kareem/commit/fb52369))
+* Add coveralls to travis ([93f6f15](https://github.com/vkarpov15/kareem/commit/93f6f15))
+* Add createWrapper() function ([ea77741](https://github.com/vkarpov15/kareem/commit/ea77741))
+* Add istanbul code coverage ([6eceeef](https://github.com/vkarpov15/kareem/commit/6eceeef))
+* Add some more comments for examples ([c5b0c6f](https://github.com/vkarpov15/kareem/commit/c5b0c6f))
+* Add travis ([e6dcb06](https://github.com/vkarpov15/kareem/commit/e6dcb06))
+* Add travis badge to docs ([ad8c9b3](https://github.com/vkarpov15/kareem/commit/ad8c9b3))
+* Add wrap() tests, 100% coverage ([6945be4](https://github.com/vkarpov15/kareem/commit/6945be4))
+* Better test coverage for execPost ([d9ad539](https://github.com/vkarpov15/kareem/commit/d9ad539))
+* Bump 0.0.5 ([69875b1](https://github.com/vkarpov15/kareem/commit/69875b1))
+* Docs fix ([15b7098](https://github.com/vkarpov15/kareem/commit/15b7098))
+* Fix silly mistake in docs generation ([50373eb](https://github.com/vkarpov15/kareem/commit/50373eb))
+* Fix typo in readme ([fec4925](https://github.com/vkarpov15/kareem/commit/fec4925))
+* Linkify travis badge ([92b25fe](https://github.com/vkarpov15/kareem/commit/92b25fe))
+* Make travis run coverage ([747157b](https://github.com/vkarpov15/kareem/commit/747157b))
+* Move travis status badge ([d52e89b](https://github.com/vkarpov15/kareem/commit/d52e89b))
+* Quick fix for coverage ([50bbddb](https://github.com/vkarpov15/kareem/commit/50bbddb))
+* Typo fix ([adea794](https://github.com/vkarpov15/kareem/commit/adea794))
 
-## 0.8.0 - 2015-04-21
 
-### Changed
 
-- Removed hefty Lodash dependency from HSTS and CSP
-- Updated string detection module in Frameguard
-- Changed readme slightly to better reflect project's focus
+<a name="0.0.4"></a>
+## <small>0.0.4 (2014-12-13)</small>
 
-### Deprecated
+* Bump 0.0.4, run docs generation ([51a15fe](https://github.com/vkarpov15/kareem/commit/51a15fe))
+* Use correct post parameters in wrap() ([9bb5da3](https://github.com/vkarpov15/kareem/commit/9bb5da3))
 
-- Deprecated `crossdomain` middleware
 
-### Removed
 
-- `crossdomain` is no longer a default middleware
+<a name="0.0.3"></a>
+## <small>0.0.3 (2014-12-12)</small>
 
-## 0.7.1 - 2015-03-23
+* Add npm test script, fix small bug with args not getting passed through post ([49e3e68](https://github.com/vkarpov15/kareem/commit/49e3e68))
+* Bump 0.0.3 ([65621d8](https://github.com/vkarpov15/kareem/commit/65621d8))
+* Update readme ([901388b](https://github.com/vkarpov15/kareem/commit/901388b))
 
-### Changed
 
-- Updated all outdated dependencies (insofar as possible)
-- HSTS now uses Lodash like all the rest of the libraries
 
-## 0.7.0 - 2015-03-05
+<a name="0.0.2"></a>
+## <small>0.0.2 (2014-12-12)</small>
 
-### Added
+* Add github repo and bump 0.0.2 ([59db8be](https://github.com/vkarpov15/kareem/commit/59db8be))
 
-- `hpkp` middleware
 
-### Changed
 
-- Travis CI should test 0.10 and 0.12
-- Minor code cleanup
+<a name="0.0.1"></a>
+## <small>0.0.1 (2014-12-12)</small>
 
-## 0.6.2 - 2015-03-01
-
-### Changed
-
-- Improved `xssFilter` performance
-- Updated Lodash versions
-
-## 0.6.1 - 2015-02-13
-
-### Added
-
-- "Other recommended modules" in README
-
-### Changed
-
-- Updated Lodash version
-
-### Fixed
-
-- `frameguard` middleware exported a function called `xframe`
-
-## 0.6.0 - 2015-01-21
-
-### Added
-
-- You can disable `csp` for Android
-
-### Fixed
-
-- `csp` on Chrome Mobile on Android and iOS
-
-## 0.5.4 - 2014-12-21
-
-### Changed
-
-- `nocache` should force revalidation
-
-## 0.5.3 - 2014-12-08
-
-### Changed
-
-- `platform` version in CSP and X-XSS-Protection
-
-### Fixed
-
-- Updated bad wording in frameguard docs
-
-## 0.5.2 - 2014-11-16
-
-### Changed
-
-- Updated Connect version
-
-### Fixed
-
-- Fixed minor `csp` bugfixes
-
-## 0.5.1 - 2014-11-09
-
-### Changed
-
-- Updated URLs in `package.json` for new URL
-
-### Fixed
-
-- CSP would set all headers forever after receiving an unknown user agent
-
-## 0.5.0 - 2014-10-28
-
-### Added
-
-- Most middlewares have some aliases now
-
-### Changed
-
-- `xframe` now called `frameguard` (though `xframe` still works)
-- `frameguard` chooses sameorigin by default
-- `frameguard` understands "SAME-ORIGIN" in addition to "SAMEORIGIN"
-- `nocache` removed from default middleware stack
-- Middleware split out into their own modules
-- Documentation
-- Updated supported Node version to at least 0.10.0
-- Bumped Connect version
-
-### Removed
-
-- Deprecation warnings
-
-### Fixed
-
-- Readme link was broken
-
-## 0.4.2 - 2014-10-16
-
-### Added
-
-- Support preload in HSTS header
-
-## 0.4.1 - 2014-08-24
-
-### Added
-
-- Use [helmet-crossdomain](https://github.com/helmetjs/crossdomain) to test the waters
-- 2 spaces instead of 4 throughout the code
-
-## 0.4.0 - 2014-07-17
-
-### Added
-
-- `nocache` now sets the Expires and Pragma headers
-- `nocache` now allows you to crush ETags
-
-### Changed
-
-- Improved the docs for nosniff
-- Reverted HSTS behavior of requiring a specified max-age
-
-### Fixed
-
-- Allow HSTS to have a max-age of 0
-
-## 0.3.2 - 2014-06-30
-
-### Added
-
-- All middleware functions are named
-- Throw error with non-positive HSTS max-age
-
-### Changed
-
-- Added semicolons in README
-- Make some Errors more specific
-
-### Removed
-
-- Removed all comment headers; refer to the readme
-
-### Fixed
-
-- `helmet()` was having issues
-- Fixed Syntax errors in README
-
-This changelog was created after the release of 0.3.1.
+* Add basic docs ([ad29ea4](https://github.com/vkarpov15/kareem/commit/ad29ea4))
+* Add pre hooks ([2ffc356](https://github.com/vkarpov15/kareem/commit/2ffc356))
+* Add wrap function ([68c540c](https://github.com/vkarpov15/kareem/commit/68c540c))
+* Bump to version 0.0.1 ([a4bfd68](https://github.com/vkarpov15/kareem/commit/a4bfd68))
+* Initial commit ([4002458](https://github.com/vkarpov15/kareem/commit/4002458))
+* Initial deposit ([98fc489](https://github.com/vkarpov15/kareem/commit/98fc489))
+* Post hooks ([395b67c](https://github.com/vkarpov15/kareem/commit/395b67c))
+* Some basic setup work ([82df75e](https://github.com/vkarpov15/kareem/commit/82df75e))
+* Support sync pre hooks ([1cc1b9f](https://github.com/vkarpov15/kareem/commit/1cc1b9f))
+* Update package.json description ([978da18](https://github.com/vkarpov15/kareem/commit/978da18))

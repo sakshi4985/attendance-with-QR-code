@@ -1,125 +1,121 @@
 'use strict';
 
-var schema = {
-  additionalItems: subschema('additionalItems'),
-  items: subschema('items'),
-  contains: subschema('contains'),
-  additionalProperties: subschema('additionalProperties'),
-  propertyNames: subschema('propertyNames'),
-  not: subschema('not'),
-  allOf: [
-    subschema('allOf_0'),
-    subschema('allOf_1'),
-    {
-      items: [
-        subschema('items_0'),
-        subschema('items_1'),
-      ]
+/*eslint-disable max-len*/
+
+var YAMLException = require('./exception');
+var Type          = require('./type');
+
+
+function compileList(schema, name) {
+  var result = [];
+
+  schema[name].forEach(function (currentType) {
+    var newIndex = result.length;
+
+    result.forEach(function (previousType, previousIndex) {
+      if (previousType.tag === currentType.tag &&
+          previousType.kind === currentType.kind &&
+          previousType.multi === currentType.multi) {
+
+        newIndex = previousIndex;
+      }
+    });
+
+    result[newIndex] = currentType;
+  });
+
+  return result;
+}
+
+
+function compileMap(/* lists... */) {
+  var result = {
+        scalar: {},
+        sequence: {},
+        mapping: {},
+        fallback: {},
+        multi: {
+          scalar: [],
+          sequence: [],
+          mapping: [],
+          fallback: []
+        }
+      }, index, length;
+
+  function collectType(type) {
+    if (type.multi) {
+      result.multi[type.kind].push(type);
+      result.multi['fallback'].push(type);
+    } else {
+      result[type.kind][type.tag] = result['fallback'][type.tag] = type;
     }
-  ],
-  anyOf: [
-    subschema('anyOf_0'),
-    subschema('anyOf_1'),
-  ],
-  oneOf: [
-    subschema('oneOf_0'),
-    subschema('oneOf_1'),
-  ],
-  definitions: {
-    foo: subschema('definitions_foo'),
-    bar: subschema('definitions_bar'),
-  },
-  properties: {
-    foo: subschema('properties_foo'),
-    bar: subschema('properties_bar'),
-  },
-  patternProperties: {
-    foo: subschema('patternProperties_foo'),
-    bar: subschema('patternProperties_bar'),
-  },
-  dependencies: {
-    foo: subschema('dependencies_foo'),
-    bar: subschema('dependencies_bar'),
-  },
-  required: ['foo', 'bar']
+  }
+
+  for (index = 0, length = arguments.length; index < length; index += 1) {
+    arguments[index].forEach(collectType);
+  }
+  return result;
+}
+
+
+function Schema(definition) {
+  return this.extend(definition);
+}
+
+
+Schema.prototype.extend = function extend(definition) {
+  var implicit = [];
+  var explicit = [];
+
+  if (definition instanceof Type) {
+    // Schema.extend(type)
+    explicit.push(definition);
+
+  } else if (Array.isArray(definition)) {
+    // Schema.extend([ type1, type2, ... ])
+    explicit = explicit.concat(definition);
+
+  } else if (definition && (Array.isArray(definition.implicit) || Array.isArray(definition.explicit))) {
+    // Schema.extend({ explicit: [ type1, type2, ... ], implicit: [ type1, type2, ... ] })
+    if (definition.implicit) implicit = implicit.concat(definition.implicit);
+    if (definition.explicit) explicit = explicit.concat(definition.explicit);
+
+  } else {
+    throw new YAMLException('Schema.extend argument should be a Type, [ Type ], ' +
+      'or a schema definition ({ implicit: [...], explicit: [...] })');
+  }
+
+  implicit.forEach(function (type) {
+    if (!(type instanceof Type)) {
+      throw new YAMLException('Specified list of YAML types (or a single Type object) contains a non-Type object.');
+    }
+
+    if (type.loadKind && type.loadKind !== 'scalar') {
+      throw new YAMLException('There is a non-scalar type in the implicit list of a schema. Implicit resolving of such types is not supported.');
+    }
+
+    if (type.multi) {
+      throw new YAMLException('There is a multi type in the implicit list of a schema. Multi tags can only be listed as explicit.');
+    }
+  });
+
+  explicit.forEach(function (type) {
+    if (!(type instanceof Type)) {
+      throw new YAMLException('Specified list of YAML types (or a single Type object) contains a non-Type object.');
+    }
+  });
+
+  var result = Object.create(Schema.prototype);
+
+  result.implicit = (this.implicit || []).concat(implicit);
+  result.explicit = (this.explicit || []).concat(explicit);
+
+  result.compiledImplicit = compileList(result, 'implicit');
+  result.compiledExplicit = compileList(result, 'explicit');
+  result.compiledTypeMap  = compileMap(result.compiledImplicit, result.compiledExplicit);
+
+  return result;
 };
 
 
-function subschema(keyword) {
-  var sch = {
-    properties: {},
-    additionalProperties: false,
-    additionalItems: false,
-    anyOf: [
-      {format: 'email'},
-      {format: 'hostname'}
-    ]
-  };
-  sch.properties['foo_' + keyword] = {title: 'foo'};
-  sch.properties['bar_' + keyword] = {title: 'bar'};
-  return sch;
-}
-
-
-module.exports = {
-  schema: schema,
-
-  // schema, jsonPtr, rootSchema, parentJsonPtr, parentKeyword, parentSchema, keyIndex
-  expectedCalls: [[schema, '', schema, undefined, undefined, undefined, undefined]]
-    .concat(expectedCalls('additionalItems'))
-    .concat(expectedCalls('items'))
-    .concat(expectedCalls('contains'))
-    .concat(expectedCalls('additionalProperties'))
-    .concat(expectedCalls('propertyNames'))
-    .concat(expectedCalls('not'))
-    .concat(expectedCallsChild('allOf', 0))
-    .concat(expectedCallsChild('allOf', 1))
-    .concat([
-      [schema.allOf[2], '/allOf/2', schema, '', 'allOf', schema, 2],
-      [schema.allOf[2].items[0], '/allOf/2/items/0', schema, '/allOf/2', 'items', schema.allOf[2], 0],
-      [schema.allOf[2].items[0].properties.foo_items_0, '/allOf/2/items/0/properties/foo_items_0', schema, '/allOf/2/items/0', 'properties', schema.allOf[2].items[0], 'foo_items_0'],
-      [schema.allOf[2].items[0].properties.bar_items_0, '/allOf/2/items/0/properties/bar_items_0', schema, '/allOf/2/items/0', 'properties', schema.allOf[2].items[0], 'bar_items_0'],
-      [schema.allOf[2].items[0].anyOf[0], '/allOf/2/items/0/anyOf/0', schema, '/allOf/2/items/0', 'anyOf', schema.allOf[2].items[0], 0],
-      [schema.allOf[2].items[0].anyOf[1], '/allOf/2/items/0/anyOf/1', schema, '/allOf/2/items/0', 'anyOf', schema.allOf[2].items[0], 1],
-
-      [schema.allOf[2].items[1], '/allOf/2/items/1', schema, '/allOf/2', 'items', schema.allOf[2], 1],
-      [schema.allOf[2].items[1].properties.foo_items_1, '/allOf/2/items/1/properties/foo_items_1', schema, '/allOf/2/items/1', 'properties', schema.allOf[2].items[1], 'foo_items_1'],
-      [schema.allOf[2].items[1].properties.bar_items_1, '/allOf/2/items/1/properties/bar_items_1', schema, '/allOf/2/items/1', 'properties', schema.allOf[2].items[1], 'bar_items_1'],
-      [schema.allOf[2].items[1].anyOf[0], '/allOf/2/items/1/anyOf/0', schema, '/allOf/2/items/1', 'anyOf', schema.allOf[2].items[1], 0],
-      [schema.allOf[2].items[1].anyOf[1], '/allOf/2/items/1/anyOf/1', schema, '/allOf/2/items/1', 'anyOf', schema.allOf[2].items[1], 1]
-    ])
-    .concat(expectedCallsChild('anyOf', 0))
-    .concat(expectedCallsChild('anyOf', 1))
-    .concat(expectedCallsChild('oneOf', 0))
-    .concat(expectedCallsChild('oneOf', 1))
-    .concat(expectedCallsChild('definitions', 'foo'))
-    .concat(expectedCallsChild('definitions', 'bar'))
-    .concat(expectedCallsChild('properties', 'foo'))
-    .concat(expectedCallsChild('properties', 'bar'))
-    .concat(expectedCallsChild('patternProperties', 'foo'))
-    .concat(expectedCallsChild('patternProperties', 'bar'))
-    .concat(expectedCallsChild('dependencies', 'foo'))
-    .concat(expectedCallsChild('dependencies', 'bar'))
-};
-
-
-function expectedCalls(keyword) {
-  return [
-    [schema[keyword], `/${keyword}`, schema, '', keyword, schema, undefined],
-    [schema[keyword].properties[`foo_${keyword}`], `/${keyword}/properties/foo_${keyword}`, schema, `/${keyword}`, 'properties', schema[keyword], `foo_${keyword}`],
-    [schema[keyword].properties[`bar_${keyword}`], `/${keyword}/properties/bar_${keyword}`, schema, `/${keyword}`, 'properties', schema[keyword], `bar_${keyword}`],
-    [schema[keyword].anyOf[0], `/${keyword}/anyOf/0`, schema, `/${keyword}`, 'anyOf', schema[keyword], 0],
-    [schema[keyword].anyOf[1], `/${keyword}/anyOf/1`, schema, `/${keyword}`, 'anyOf', schema[keyword], 1]
-  ];
-}
-
-
-function expectedCallsChild(keyword, i) {
-  return [
-    [schema[keyword][i], `/${keyword}/${i}`, schema, '', keyword, schema, i],
-    [schema[keyword][i].properties[`foo_${keyword}_${i}`], `/${keyword}/${i}/properties/foo_${keyword}_${i}`, schema, `/${keyword}/${i}`, 'properties', schema[keyword][i], `foo_${keyword}_${i}`],
-    [schema[keyword][i].properties[`bar_${keyword}_${i}`], `/${keyword}/${i}/properties/bar_${keyword}_${i}`, schema, `/${keyword}/${i}`, 'properties', schema[keyword][i], `bar_${keyword}_${i}`],
-    [schema[keyword][i].anyOf[0], `/${keyword}/${i}/anyOf/0`, schema, `/${keyword}/${i}`, 'anyOf', schema[keyword][i], 0],
-    [schema[keyword][i].anyOf[1], `/${keyword}/${i}/anyOf/1`, schema, `/${keyword}/${i}`, 'anyOf', schema[keyword][i], 1]
-  ];
-}
+module.exports = Schema;
