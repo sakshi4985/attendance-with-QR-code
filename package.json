@@ -1,37 +1,37 @@
 {
-  "name": "safe-buffer",
-  "description": "Safer Node.js Buffer API",
-  "version": "5.1.2",
-  "author": {
-    "name": "Feross Aboukhadijeh",
-    "email": "feross@feross.org",
-    "url": "http://feross.org"
-  },
-  "bugs": {
-    "url": "https://github.com/feross/safe-buffer/issues"
-  },
-  "devDependencies": {
-    "standard": "*",
-    "tape": "^4.0.0"
-  },
-  "homepage": "https://github.com/feross/safe-buffer",
-  "keywords": [
-    "buffer",
-    "buffer allocate",
-    "node security",
-    "safe",
-    "safe-buffer",
-    "security",
-    "uninitialized"
+  "name": "text-encoding",
+  "author": "Joshua Bell <inexorabletash@gmail.com>",
+  "contributors": [
+    "Joshua Bell <inexorabletash@gmail.com>",
+    "Rick Eyre <rick.eyre@outlook.com>",
+    "Eugen Podaru <eugen.podaru@live.com>",
+    "Filip Dupanović <filip.dupanovic@gmail.com>",
+    "Anne van Kesteren <annevk@annevk.nl>",
+    "Author: Francis Avila <francisga@gmail.com>",
+    "Michael J. Ryan <tracker1@gmail.com>",
+    "Pierre Queinnec <pierre@queinnec.org>",
+    "Zack Weinberg <zackw@panix.com>"
   ],
-  "license": "MIT",
+  "version": "0.7.0",
+  "description": "Polyfill for the Encoding Living Standard's API.",
   "main": "index.js",
-  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "lib/encoding.js",
+    "lib/encoding-indexes.js"
+  ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/feross/safe-buffer.git"
+    "url": "https://github.com/inexorabletash/text-encoding.git"
   },
-  "scripts": {
-    "test": "standard && tape test/*.js"
-  }
+  "keywords": [
+    "encoding",
+    "decoding",
+    "living standard"
+  ],
+  "bugs": {
+    "url": "https://github.com/inexorabletash/text-encoding/issues"
+  },
+  "homepage": "https://github.com/inexorabletash/text-encoding",
+  "license": "(Unlicense OR Apache-2.0)"
 }
