@@ -1,33 +1,41 @@
-# express-validator
+# get-caller-file
 
-[![npm version](https://img.shields.io/npm/v/express-validator.svg)](https://www.npmjs.com/package/express-validator)
-[![Build status](https://github.com/express-validator/express-validator/actions/workflows/ci.yml/badge.svg)](https://github.com/express-validator/express-validator/actions/workflows/ci.yml)
-[![Coverage Status](https://img.shields.io/coveralls/express-validator/express-validator.svg)](https://coveralls.io/github/express-validator/express-validator?branch=master)
+[![Build Status](https://travis-ci.org/stefanpenner/get-caller-file.svg?branch=master)](https://travis-ci.org/stefanpenner/get-caller-file)
+[![Build status](https://ci.appveyor.com/api/projects/status/ol2q94g1932cy14a/branch/master?svg=true)](https://ci.appveyor.com/project/embercli/get-caller-file/branch/master)
 
-An [express.js](https://github.com/visionmedia/express) middleware for
-[validator](https://github.com/validatorjs/validator.js).
+This is a utility, which allows a function to figure out from which file it was invoked. It does so by inspecting v8's stack trace at the time it is invoked.
 
-- [Installation](#installation)
-- [Documentation](#documentation)
-- [Changelog](#changelog)
-- [License](#license)
+Inspired by http://stackoverflow.com/questions/13227489
+
+*note: this relies on Node/V8 specific APIs, as such other runtimes may not work*
 
 ## Installation
 
+```bash
+yarn add get-caller-file
 ```
-npm install express-validator
+
+## Usage
+
+Given:
+
+```js
+// ./foo.js
+const getCallerFile = require('get-caller-file');
+
+module.exports = function() {
+  return getCallerFile(); // figures out who called it
+};
 ```
 
-Also make sure that you have Node.js 14 or newer in order to use it.
+```js
+// index.js
+const foo = require('./foo');
 
-## Documentation
+foo() // => /full/path/to/this/file/index.js
+```
 
-Please refer to the documentation website on https://express-validator.github.io.
 
-## Changelog
+## Options:
 
-Check the [GitHub Releases page](https://github.com/express-validator/express-validator/releases).
-
-## License
-
-MIT License
+* `getCallerFile(position = 2)`: where position is stack frame whos fileName we want.

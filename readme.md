@@ -1,151 +1,156 @@
-<h1 align="center"> <code>express-rate-limit</code> </h1>
+# find-up [![Build Status](https://travis-ci.org/sindresorhus/find-up.svg?branch=master)](https://travis-ci.org/sindresorhus/find-up)
 
-<div align="center">
+> Find a file or directory by walking up parent directories
 
-[![tests](https://img.shields.io/github/actions/workflow/status/express-rate-limit/express-rate-limit/ci.yaml)](https://github.com/express-rate-limit/express-rate-limit/actions/workflows/ci.yaml)
-[![npm version](https://img.shields.io/npm/v/express-rate-limit.svg)](https://npmjs.org/package/express-rate-limit 'View this project on NPM')
-[![npm downloads](https://img.shields.io/npm/dm/express-rate-limit)](https://www.npmjs.com/package/express-rate-limit)
-[![license](https://img.shields.io/npm/l/express-rate-limit)](license.md)
 
-</div>
+## Install
 
-Basic rate-limiting middleware for [Express](http://expressjs.com/). Use to
-limit repeated requests to public APIs and/or endpoints such as password reset.
-Plays nice with
-[express-slow-down](https://www.npmjs.com/package/express-slow-down) and
-[ratelimit-header-parser](https://www.npmjs.com/package/ratelimit-header-parser).
+```
+$ npm install find-up
+```
+
 
 ## Usage
 
-The [full documentation](https://express-rate-limit.mintlify.app/overview) is
-available on-line.
-
-```ts
-import { rateLimit } from 'express-rate-limit'
-
-const limiter = rateLimit({
-	windowMs: 15 * 60 * 1000, // 15 minutes
-	limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
-	standardHeaders: 'draft-8', // draft-6: `RateLimit-*` headers; draft-7 & draft-8: combined `RateLimit` header
-	legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
-	ipv6Subnet: 56, // Set to 60 or 64 to be less aggressive, or 52 or 48 to be more aggressive
-	// store: ... , // Redis, Memcached, etc. See below.
-})
-
-// Apply the rate limiting middleware to all requests.
-app.use(limiter)
+```
+/
+└── Users
+    └── sindresorhus
+        ├── unicorn.png
+        └── foo
+            └── bar
+                ├── baz
+                └── example.js
 ```
 
-### Data Stores
+`example.js`
 
-The rate limiter comes with a built-in memory store, and supports a variety of
-[external data stores](https://express-rate-limit.mintlify.app/reference/stores).
+```js
+const path = require('path');
+const findUp = require('find-up');
 
-### Configuration
+(async () => {
+	console.log(await findUp('unicorn.png'));
+	//=> '/Users/sindresorhus/unicorn.png'
 
-All function options may be async. Click the name for additional info and
-default values.
+	console.log(await findUp(['rainbow.png', 'unicorn.png']));
+	//=> '/Users/sindresorhus/unicorn.png'
 
-| Option                     | Type                                      | Remarks                                                                                         |
-| -------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| [`windowMs`]               | `number`                                  | How long to remember requests for, in milliseconds.                                             |
-| [`limit`]                  | `number` \| `function`                    | How many requests to allow.                                                                     |
-| [`message`]                | `string` \| `json` \| `function`          | Response to return after limit is reached.                                                      |
-| [`statusCode`]             | `number`                                  | HTTP status code after limit is reached (default is 429).                                       |
-| [`handler`]                | `function`                                | Function to run after limit is reached (overrides `message` and `statusCode` settings, if set). |
-| [`legacyHeaders`]          | `boolean`                                 | Enable the `X-Rate-Limit` header.                                                               |
-| [`standardHeaders`]        | `'draft-6'` \| `'draft-7'` \| `'draft-8'` | Enable the `Ratelimit` header.                                                                  |
-| [`identifier`]             | `string` \| `function`                    | Name associated with the quota policy enforced by this rate limiter.                            |
-| [`store`]                  | `Store`                                   | Use a custom store to share hit counts across multiple nodes.                                   |
-| [`passOnStoreError`]       | `boolean`                                 | Allow (`true`) or block (`false`, default) traffic if the store becomes unavailable.            |
-| [`keyGenerator`]           | `function`                                | Identify users (defaults to IP address).                                                        |
-| [`ipv6Subnet`]             | `number` (32-64) \| `function` \| `false` | How many bits of IPv6 addresses to use in default `keyGenerator`                                |
-| [`requestPropertyName`]    | `string`                                  | Add rate limit info to the `req` object.                                                        |
-| [`skip`]                   | `function`                                | Return `true` to bypass the limiter for the given request.                                      |
-| [`skipSuccessfulRequests`] | `boolean`                                 | Uncount 1xx/2xx/3xx responses.                                                                  |
-| [`skipFailedRequests`]     | `boolean`                                 | Uncount 4xx/5xx responses.                                                                      |
-| [`requestWasSuccessful`]   | `function`                                | Used by `skipSuccessfulRequests` and `skipFailedRequests`.                                      |
-| [`validate`]               | `boolean` \| `object`                     | Enable or disable built-in validation checks.                                                   |
+	console.log(await findUp(async directory => {
+		const hasUnicorns = await findUp.exists(path.join(directory, 'unicorn.png'));
+		return hasUnicorns && directory;
+	}, {type: 'directory'}));
+	//=> '/Users/sindresorhus'
+})();
+```
 
-## Thank You
 
-Sponsored by [Zuplo](https://zuplo.link/express-rate-limit) a fully-managed API
-Gateway for developers. Add
-[dynamic rate-limiting](https://zuplo.link/dynamic-rate-limiting),
-authentication and more to any API in minutes. Learn more at
-[zuplo.com](https://zuplo.link/express-rate-limit)
+## API
 
-<p align="center">
-<a href="https://zuplo.link/express-rate-limit">
-<picture width="322">
-  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/express-rate-limit/express-rate-limit/assets/114976/cd2f6fa7-eae1-4fbb-be7d-b17df4c6f383">
-  <img alt="zuplo-logo" src="https://github.com/express-rate-limit/express-rate-limit/assets/114976/66fd75fa-b39e-4a8c-8d7a-52369bf244dc" width="322">
-</picture>
-</a>
-</p>
+### findUp(name, options?)
+### findUp(matcher, options?)
+
+Returns a `Promise` for either the path or `undefined` if it couldn't be found.
+
+### findUp([...name], options?)
+
+Returns a `Promise` for either the first path found (by respecting the order of the array) or `undefined` if none could be found.
+
+### findUp.sync(name, options?)
+### findUp.sync(matcher, options?)
+
+Returns a path or `undefined` if it couldn't be found.
+
+### findUp.sync([...name], options?)
+
+Returns the first path found (by respecting the order of the array) or `undefined` if none could be found.
+
+#### name
+
+Type: `string`
+
+Name of the file or directory to find.
+
+#### matcher
+
+Type: `Function`
+
+A function that will be called with each directory until it returns a `string` with the path, which stops the search, or the root directory has been reached and nothing was found. Useful if you want to match files with certain patterns, set of permissions, or other advanced use-cases.
+
+When using async mode, the `matcher` may optionally be an async or promise-returning function that returns the path.
+
+#### options
+
+Type: `object`
+
+##### cwd
+
+Type: `string`<br>
+Default: `process.cwd()`
+
+Directory to start from.
+
+##### type
+
+Type: `string`<br>
+Default: `'file'`<br>
+Values: `'file'` `'directory'`
+
+The type of paths that can match.
+
+##### allowSymlinks
+
+Type: `boolean`<br>
+Default: `true`
+
+Allow symbolic links to match if they point to the chosen path type.
+
+### findUp.exists(path)
+
+Returns a `Promise<boolean>` of whether the path exists.
+
+### findUp.sync.exists(path)
+
+Returns a `boolean` of whether the path exists.
+
+#### path
+
+Type: `string`
+
+Path to a file or directory.
+
+### findUp.stop
+
+A [`Symbol`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol) that can be returned by a `matcher` function to stop the search and cause `findUp` to immediately return `undefined`. Useful as a performance optimization in case the current working directory is deeply nested in the filesystem.
+
+```js
+const path = require('path');
+const findUp = require('find-up');
+
+(async () => {
+	await findUp(directory => {
+		return path.basename(directory) === 'work' ? findUp.stop : 'logo.png';
+	});
+})();
+```
+
+
+## Related
+
+- [find-up-cli](https://github.com/sindresorhus/find-up-cli) - CLI for this module
+- [pkg-up](https://github.com/sindresorhus/pkg-up) - Find the closest package.json file
+- [pkg-dir](https://github.com/sindresorhus/pkg-dir) - Find the root directory of an npm package
+- [resolve-from](https://github.com/sindresorhus/resolve-from) - Resolve the path of a module like `require.resolve()` but from a given path
+
 
 ---
 
-Thanks to Mintlify for hosting the documentation at
-[express-rate-limit.mintlify.app](https://express-rate-limit.mintlify.app)
-
-<p align="center">
-	<a href="https://mintlify.com/?utm_campaign=devmark&utm_medium=readme&utm_source=express-rate-limit">
-		<img height="75" src="https://devmark-public-assets.s3.us-west-2.amazonaws.com/sponsorships/mintlify.svg" alt="Create your docs today">
-	</a>
-</p>
-
----
-
-Finally, thank you to everyone who's contributed to this project in any way! 🫶
-
-## Issues and Contributing
-
-If you encounter a bug or want to see something added/changed, please go ahead
-and
-[open an issue](https://github.com/express-rate-limit/express-rate-limit/issues/new)!
-If you need help with something, feel free to
-[start a discussion](https://github.com/express-rate-limit/express-rate-limit/discussions/new)!
-
-If you wish to contribute to the library, thanks! First, please read
-[the contributing guide](https://express-rate-limit.mintlify.app/docs/guides/contributing.mdx).
-Then you can pick up any issue and fix/implement it!
-
-## License
-
-MIT © [Nathan Friedly](http://nfriedly.com/),
-[Vedant K](https://github.com/gamemaker1)
-
-[`windowMs`]:
-	https://express-rate-limit.mintlify.app/reference/configuration#windowms
-[`limit`]: https://express-rate-limit.mintlify.app/reference/configuration#limit
-[`message`]:
-	https://express-rate-limit.mintlify.app/reference/configuration#message
-[`statusCode`]:
-	https://express-rate-limit.mintlify.app/reference/configuration#statuscode
-[`handler`]:
-	https://express-rate-limit.mintlify.app/reference/configuration#handler
-[`legacyHeaders`]:
-	https://express-rate-limit.mintlify.app/reference/configuration#legacyheaders
-[`standardHeaders`]:
-	https://express-rate-limit.mintlify.app/reference/configuration#standardheaders
-[`identifier`]:
-	https://express-rate-limit.mintlify.app/reference/configuration#identifier
-[`store`]: https://express-rate-limit.mintlify.app/reference/configuration#store
-[`passOnStoreError`]:
-	https://express-rate-limit.mintlify.app/reference/configuration#passonstoreerror
-[`keyGenerator`]:
-	https://express-rate-limit.mintlify.app/reference/configuration#keygenerator
-[`ipv6Subnet`]:
-	https://express-rate-limit.mintlify.app/reference/configuration#ipv6subnet
-[`requestPropertyName`]:
-	https://express-rate-limit.mintlify.app/reference/configuration#requestpropertyname
-[`skip`]: https://express-rate-limit.mintlify.app/reference/configuration#skip
-[`skipSuccessfulRequests`]:
-	https://express-rate-limit.mintlify.app/reference/configuration#skipsuccessfulrequests
-[`skipFailedRequests`]:
-	https://express-rate-limit.mintlify.app/reference/configuration#skipfailedrequests
-[`requestWasSuccessful`]:
-	https://express-rate-limit.mintlify.app/reference/configuration#requestwassuccessful
-[`validate`]:
-	https://express-rate-limit.mintlify.app/reference/configuration#validate
+<div align="center">
+	<b>
+		<a href="https://tidelift.com/subscription/pkg/npm-find-up?utm_source=npm-find-up&utm_medium=referral&utm_campaign=readme">Get professional support for 'find-up' with a Tidelift subscription</a>
+	</b>
+	<br>
+	<sub>
+		Tidelift helps make open source sustainable for maintainers while giving companies<br>assurances about security, maintenance, and licensing for their dependencies.
+	</sub>
+</div>

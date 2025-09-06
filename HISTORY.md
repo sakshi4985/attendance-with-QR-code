@@ -1,58 +1,80 @@
-2.8.5 / 2018-11-04
+2.0.0 - 2024-09-04
+==========
+ * Drop support for Node.js <18
+
+1.0.0 - 2024-09-04
+==========
+
+  * Drop support for Node.js below 0.8
+  * Fix: Ignore `If-Modified-Since` in the presence of `If-None-Match`, according to [spec](https://www.rfc-editor.org/rfc/rfc9110.html#section-13.1.3-5). Fixes [#35](https://github.com/jshttp/fresh/issues/35)
+
+0.5.2 / 2017-09-13
 ==================
 
-  * Fix setting `maxAge` option to `0`
+  * Fix regression matching multiple ETags in `If-None-Match`
+  * perf: improve `If-None-Match` token parsing
 
-2.8.4 / 2017-07-12
+0.5.1 / 2017-09-11
 ==================
 
-  * Work-around Safari bug in default pre-flight response
+  * Fix handling of modified headers with invalid dates
+  * perf: improve ETag match loop
 
-2.8.3 / 2017-03-29
+0.5.0 / 2017-02-21
 ==================
 
-  * Fix error when options delegate missing `methods` option
+  * Fix incorrect result when `If-None-Match` has both `*` and ETags
+  * Fix weak `ETag` matching to match spec
+  * perf: delay reading header values until needed
+  * perf: skip checking modified time if ETag check failed
+  * perf: skip parsing `If-None-Match` when no `ETag` header
+  * perf: use `Date.parse` instead of `new Date`
 
-2.8.2 / 2017-03-28
+0.4.0 / 2017-02-05
 ==================
 
-  * Fix error when frozen options are passed
-  * Send "Vary: Origin" when using regular expressions
-  * Send "Vary: Access-Control-Request-Headers" when dynamic `allowedHeaders`
+  * Fix false detection of `no-cache` request directive
+  * perf: enable strict mode
+  * perf: hoist regular expressions
+  * perf: remove duplicate conditional
+  * perf: remove unnecessary boolean coercions
 
-2.8.1 / 2016-09-08
+0.3.0 / 2015-05-12
 ==================
 
-This release only changed documentation.
+  * Add weak `ETag` matching support
 
-2.8.0 / 2016-08-23
+0.2.4 / 2014-09-07
 ==================
 
-  * Add `optionsSuccessStatus` option
+  * Support Node.js 0.6
 
-2.7.2 / 2016-08-23
+0.2.3 / 2014-09-07
 ==================
 
-  * Fix error when Node.js running in strict mode
+  * Move repository to jshttp
 
-2.7.1 / 2015-05-28
+0.2.2 / 2014-02-19
 ==================
 
-  * Move module into expressjs organization
+  * Revert "Fix for blank page on Safari reload"
 
-2.7.0 / 2015-05-28
+0.2.1 / 2014-01-29
 ==================
 
-  * Allow array of matching condition as `origin` option
-  * Allow regular expression as `origin` option
+  * Fix for blank page on Safari reload
 
-2.6.1 / 2015-05-28
+0.2.0 / 2013-08-11
 ==================
 
-  * Update `license` in package.json
+  * Return stale for `Cache-Control: no-cache`
 
-2.6.0 / 2015-04-27
+0.1.0 / 2012-06-15
 ==================
 
-  * Add `preflightContinue` option
-  * Fix "Vary: Origin" header added for "*"
+  * Add `If-None-Match: *` support
+
+0.0.1 / 2012-06-10
+==================
+
+  * Initial release

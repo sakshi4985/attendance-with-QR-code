@@ -1,23 +1,13 @@
+'use strict';
+
 var test = require('tape');
-var equal = require('../');
+var stringify = require('../');
 
-test('equal', function (t) {
-    t.ok(equal(
-        { a : [ 2, 3 ], b : [ 4 ] },
-        { a : [ 2, 3 ], b : [ 4 ] }
-    ));
-    t.end();
-});
-
-test('not equal', function (t) {
-    t.notOk(equal(
-        { x : 5, y : [6] },
-        { x : 5, y : 6 }
-    ));
-    t.end();
-});
-
-test('nested nulls', function (t) {
-    t.ok(equal([ null, null, null ], [ null, null, null ]));
-    t.end();
+test('custom comparison function', function (t) {
+    t.plan(1);
+    var obj = { c: 8, b: [{z:6,y:5,x:4},7], a: 3 };
+    var s = stringify(obj, function (a, b) {
+        return a.key < b.key ? 1 : -1;
+    });
+    t.equal(s, '{"c":8,"b":[{"z":6,"y":5,"x":4},7],"a":3}');
 });

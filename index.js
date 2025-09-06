@@ -1,25 +1,22 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
+// Call this function in a another function to find out the file from
+// which that function was called from. (Inspects the v8 stack trace)
+//
+// Inspired by http://stackoverflow.com/questions/13227489
+module.exports = function getCallerFile(position) {
+    if (position === void 0) { position = 2; }
+    if (position >= Error.stackTraceLimit) {
+        throw new TypeError('getCallerFile(position) requires position be less then Error.stackTraceLimit but position was: `' + position + '` and Error.stackTraceLimit was: `' + Error.stackTraceLimit + '`');
     }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+    var oldPrepareStackTrace = Error.prepareStackTrace;
+    Error.prepareStackTrace = function (_, stack) { return stack; };
+    var stack = new Error().stack;
+    Error.prepareStackTrace = oldPrepareStackTrace;
+    if (stack !== null && typeof stack === 'object') {
+        // stack[0] holds this file
+        // stack[1] holds where this function was called
+        // stack[2] holds the file we're interested in
+        return stack[position] ? stack[position].getFileName() : undefined;
+    }
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkSchema = void 0;
-__exportStar(require("./middlewares/exact"), exports);
-__exportStar(require("./middlewares/one-of"), exports);
-__exportStar(require("./middlewares/validation-chain-builders"), exports);
-var schema_1 = require("./middlewares/schema");
-Object.defineProperty(exports, "checkSchema", { enumerable: true, get: function () { return schema_1.checkSchema; } });
-__exportStar(require("./matched-data"), exports);
-__exportStar(require("./validation-result"), exports);
-__exportStar(require("./express-validator"), exports);
+//# sourceMappingURL=index.js.map

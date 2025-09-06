@@ -1,56 +1,42 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.bindAll = void 0;
-exports.toString = toString;
-exports.runAllChains = runAllChains;
-const bindAll = (object) => {
-    const protoKeys = Object.getOwnPropertyNames(Object.getPrototypeOf(object));
-    protoKeys.forEach(key => {
-        const maybeFn = object[key];
-        if (typeof maybeFn === 'function' && key !== 'constructor') {
-            object[key] = maybeFn.bind(object);
-        }
-    });
-    return object;
-};
-exports.bindAll = bindAll;
-function toString(value) {
-    if (value instanceof Date) {
-        return value.toISOString();
-    }
-    else if (value && typeof value === 'object' && value.toString) {
-        if (typeof value.toString !== 'function') {
-            return Object.getPrototypeOf(value).toString.call(value);
-        }
-        return value.toString();
-    }
-    else if (value == null || (isNaN(value) && !value.length)) {
-        return '';
-    }
-    return String(value);
+const fs = require('fs');
+const path = require('path');
+const flatted = require('flatted');
+
+function tryParse(filePath, defaultValue) {
+  let result;
+  try {
+    result = readJSON(filePath);
+  } catch (ex) {
+    result = defaultValue;
+  }
+  return result;
 }
+
 /**
- * Runs all validation chains, and returns their results.
+ * Read json file synchronously using flatted
  *
- * If one of them has a request-level bail set, the previous chains will be awaited on so that
- * results are not skewed, which can be slow.
- * If this same chain also contains errors, no further chains are run.
+ * @param  {String} filePath Json filepath
+ * @returns {*} parse result
  */
-async function runAllChains(req, chains, runOpts) {
-    const promises = [];
-    for (const chain of chains) {
-        const bails = chain.builder.build().bail;
-        if (bails) {
-            await Promise.all(promises);
-        }
-        const resultPromise = chain.run(req, runOpts);
-        promises.push(resultPromise);
-        if (bails) {
-            const result = await resultPromise;
-            if (!result.isEmpty()) {
-                break;
-            }
-        }
-    }
-    return Promise.all(promises);
+function readJSON(filePath) {
+  return flatted.parse(
+    fs.readFileSync(filePath, {
+      encoding: 'utf8',
+    })
+  );
 }
+
+/**
+ * Write json file synchronously using circular-json
+ *
+ * @param  {String} filePath Json filepath
+ * @param  {*} data Object to serialize
+ */
+function writeJSON(filePath, data) {
+  fs.mkdirSync(path.dirname(filePath), {
+    recursive: true,
+  });
+  fs.writeFileSync(filePath, flatted.stringify(data));
+}
+
+module.exports = { tryParse, readJSON, writeJSON };
