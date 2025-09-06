@@ -1,66 +1,76 @@
-'use strict';
-
-const {sep} = require('path');
-const {platform} = process;
-const os = require('os');
-
-exports.EV_ALL = 'all';
-exports.EV_READY = 'ready';
-exports.EV_ADD = 'add';
-exports.EV_CHANGE = 'change';
-exports.EV_ADD_DIR = 'addDir';
-exports.EV_UNLINK = 'unlink';
-exports.EV_UNLINK_DIR = 'unlinkDir';
-exports.EV_RAW = 'raw';
-exports.EV_ERROR = 'error';
-
-exports.STR_DATA = 'data';
-exports.STR_END = 'end';
-exports.STR_CLOSE = 'close';
-
-exports.FSEVENT_CREATED = 'created';
-exports.FSEVENT_MODIFIED = 'modified';
-exports.FSEVENT_DELETED = 'deleted';
-exports.FSEVENT_MOVED = 'moved';
-exports.FSEVENT_CLONED = 'cloned';
-exports.FSEVENT_UNKNOWN = 'unknown';
-exports.FSEVENT_FLAG_MUST_SCAN_SUBDIRS = 1;
-exports.FSEVENT_TYPE_FILE = 'file';
-exports.FSEVENT_TYPE_DIRECTORY = 'directory';
-exports.FSEVENT_TYPE_SYMLINK = 'symlink';
-
-exports.KEY_LISTENERS = 'listeners';
-exports.KEY_ERR = 'errHandlers';
-exports.KEY_RAW = 'rawEmitters';
-exports.HANDLER_KEYS = [exports.KEY_LISTENERS, exports.KEY_ERR, exports.KEY_RAW];
-
-exports.DOT_SLASH = `.${sep}`;
-
-exports.BACK_SLASH_RE = /\\/g;
-exports.DOUBLE_SLASH_RE = /\/\//;
-exports.SLASH_OR_BACK_SLASH_RE = /[/\\]/;
-exports.DOT_RE = /\..*\.(sw[px])$|~$|\.subl.*\.tmp/;
-exports.REPLACER_RE = /^\.[/\\]/;
-
-exports.SLASH = '/';
-exports.SLASH_SLASH = '//';
-exports.BRACE_START = '{';
-exports.BANG = '!';
-exports.ONE_DOT = '.';
-exports.TWO_DOTS = '..';
-exports.STAR = '*';
-exports.GLOBSTAR = '**';
-exports.ROOT_GLOBSTAR = '/**/*';
-exports.SLASH_GLOBSTAR = '/**';
-exports.DIR_SUFFIX = 'Dir';
-exports.ANYMATCH_OPTS = {dot: true};
-exports.STRING_TYPE = 'string';
-exports.FUNCTION_TYPE = 'function';
-exports.EMPTY_STR = '';
-exports.EMPTY_FN = () => {};
-exports.IDENTITY_FN = val => val;
-
-exports.isWindows = platform === 'win32';
-exports.isMacos = platform === 'darwin';
-exports.isLinux = platform === 'linux';
-exports.isIBMi = os.type() === 'OS400';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.RE_URL_WITH_PORT = exports.RE_URL = exports.RE_ZONE_STRING = exports.RE_SUBNET_STRING = exports.RE_BAD_ADDRESS = exports.RE_BAD_CHARACTERS = exports.TYPES = exports.SCOPES = exports.GROUPS = exports.BITS = void 0;
+exports.BITS = 128;
+exports.GROUPS = 8;
+/**
+ * Represents IPv6 address scopes
+ * @memberof Address6
+ * @static
+ */
+exports.SCOPES = {
+    0: 'Reserved',
+    1: 'Interface local',
+    2: 'Link local',
+    4: 'Admin local',
+    5: 'Site local',
+    8: 'Organization local',
+    14: 'Global',
+    15: 'Reserved',
+};
+/**
+ * Represents IPv6 address types
+ * @memberof Address6
+ * @static
+ */
+exports.TYPES = {
+    'ff01::1/128': 'Multicast (All nodes on this interface)',
+    'ff01::2/128': 'Multicast (All routers on this interface)',
+    'ff02::1/128': 'Multicast (All nodes on this link)',
+    'ff02::2/128': 'Multicast (All routers on this link)',
+    'ff05::2/128': 'Multicast (All routers in this site)',
+    'ff02::5/128': 'Multicast (OSPFv3 AllSPF routers)',
+    'ff02::6/128': 'Multicast (OSPFv3 AllDR routers)',
+    'ff02::9/128': 'Multicast (RIP routers)',
+    'ff02::a/128': 'Multicast (EIGRP routers)',
+    'ff02::d/128': 'Multicast (PIM routers)',
+    'ff02::16/128': 'Multicast (MLDv2 reports)',
+    'ff01::fb/128': 'Multicast (mDNSv6)',
+    'ff02::fb/128': 'Multicast (mDNSv6)',
+    'ff05::fb/128': 'Multicast (mDNSv6)',
+    'ff02::1:2/128': 'Multicast (All DHCP servers and relay agents on this link)',
+    'ff05::1:2/128': 'Multicast (All DHCP servers and relay agents in this site)',
+    'ff02::1:3/128': 'Multicast (All DHCP servers on this link)',
+    'ff05::1:3/128': 'Multicast (All DHCP servers in this site)',
+    '::/128': 'Unspecified',
+    '::1/128': 'Loopback',
+    'ff00::/8': 'Multicast',
+    'fe80::/10': 'Link-local unicast',
+};
+/**
+ * A regular expression that matches bad characters in an IPv6 address
+ * @memberof Address6
+ * @static
+ */
+exports.RE_BAD_CHARACTERS = /([^0-9a-f:/%])/gi;
+/**
+ * A regular expression that matches an incorrect IPv6 address
+ * @memberof Address6
+ * @static
+ */
+exports.RE_BAD_ADDRESS = /([0-9a-f]{5,}|:{3,}|[^:]:$|^:[^:]|\/$)/gi;
+/**
+ * A regular expression that matches an IPv6 subnet
+ * @memberof Address6
+ * @static
+ */
+exports.RE_SUBNET_STRING = /\/\d{1,3}(?=%|$)/;
+/**
+ * A regular expression that matches an IPv6 zone
+ * @memberof Address6
+ * @static
+ */
+exports.RE_ZONE_STRING = /%.*$/;
+exports.RE_URL = /^\[{0,1}([0-9a-f:]+)\]{0,1}/;
+exports.RE_URL_WITH_PORT = /\[([0-9a-f:]+)\]:([0-9]{1,5})/;
+//# sourceMappingURL=constants.js.map
